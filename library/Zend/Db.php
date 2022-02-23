@@ -255,15 +255,6 @@ class Zend_Db
         $adapterName .= str_replace(' ', '_', ucwords(str_replace('_', ' ', strtolower($adapter))));
 
         /*
-         * Load the adapter class.  This throws an exception
-         * if the specified class cannot be loaded.
-         */
-        if (!class_exists($adapterName)) {
-            // require_once 'Zend/Loader.php';
-            Zend_Loader::loadClass($adapterName);
-        }
-
-        /*
          * Create an instance of the adapter class.
          * Pass the config to the adapter class constructor.
          */
