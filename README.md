@@ -9,5 +9,5 @@
 3. Depencancies removed:
   - Zend_Loader
   - Zend_Registry
-
+4. We improved the `quoteInto()` method
 

@@ -903,6 +903,9 @@ abstract class Zend_Db_Adapter_Abstract
     }
 
     /**
+     * Our own version of "quoteInto()" supports multiple "?" and takes an array of $value.
+     * Backwards compatible with single "?" and single $value
+     *
      * Quotes a value and places into a piece of text at a placeholder.
      *
      * The placeholder is a question-mark; all placeholders will be replaced
@@ -923,10 +926,19 @@ abstract class Zend_Db_Adapter_Abstract
      */
     public function quoteInto($text, $value, $type = null, $count = null)
     {
-        if ($count === null) {
-            return str_replace('?', $this->quote($value, $type), $text);
+        if (is_array($value) && substr_count($text, '?') > 1) {
+            // TODO test this
+            $where = $text;
+            foreach ($value as $oneValue) {
+                $where = $this->str_replace_first('?', $this->quote($oneValue, $type), $where);
+            }
+            return $where;
         } else {
-            return implode($this->quote($value, $type), explode('?', $text, $count + 1));
+            if ($count === null) {
+                return str_replace('?', $this->quote($value, $type), $text);
+            } else {
+                return implode($this->quote($value, $type), explode('?', $text, $count + 1));
+            }
         }
     }
 
