@@ -575,6 +575,69 @@ abstract class Zend_Db_Adapter_Abstract
     }
 
     /**
+     * Inserts a table row with specified data or update if there was a duplicate key.
+     *
+     * @param mixed $table The table to insert data into.
+     * @param array $bind Column-value pairs.
+     * @return int The number of affected rows.
+     * @throws Zend_Db_Adapter_Exception
+     */
+    public function insertOnDuplicateKeyUpdate($table, array $bind, array $updateBind)
+    {
+        // extract and quote col names from the array keys
+        $cols = array();
+        $vals = array();
+        $i = 0;
+        foreach ($bind as $col => $val) {
+            $cols[] = $this->quoteIdentifier($col, true);
+            if ($val instanceof Zend_Db_Expr) {
+                $vals[] = $val->__toString();
+                unset($bind[$col]);
+            } else {
+                if ($this->supportsParameters('positional')) {
+                    $vals[] = '?';
+                } else {
+                    if ($this->supportsParameters('named')) {
+                        unset($bind[$col]);
+                        $bind[':col'.$i] = $val;
+                        $vals[] = ':col'.$i;
+                        $i++;
+                    } else {
+                        /** @see Zend_Db_Adapter_Exception */
+                        // require_once 'Zend/Db/Adapter/Exception.php';
+                        throw new Zend_Db_Adapter_Exception(get_class($this) ." doesn't support positional or named binding");
+                    }
+                }
+            }
+        }
+
+        // build the statement
+        $sql = "INSERT INTO "
+            . $this->quoteIdentifier($table, true)
+            . ' (' . implode(', ', $cols) . ') '
+            . 'VALUES (' . implode(', ', $vals) . ') ON DUPLICATE KEY UPDATE ';
+
+        $updateParts = [];
+        foreach($cols as $i => $col){
+            $val = $vals[$i];
+            $updateParts[] = $col.' = '.$val;
+        }
+
+        $sql .= implode(', ', $updateParts);
+
+        // execute the statement and return the number of affected rows
+        if ($this->supportsParameters('positional')) {
+            $bind = array_values($bind);
+        }
+        
+        $bind = array_merge($bind,$bind);
+
+        $stmt = $this->query($sql, $bind);
+        $result = $stmt->rowCount();
+        return $result;
+    }
+
+    /**
      * Updates table rows with specified data based on a WHERE clause.
      *
      * @param  mixed        $table The table to update.
