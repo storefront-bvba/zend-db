@@ -10,4 +10,4 @@
   - Zend_Loader
   - Zend_Registry
 4. We improved the `quoteInto()` method
-
+5. We improved the `describeTable()` method, so it returns the length for integer columns
