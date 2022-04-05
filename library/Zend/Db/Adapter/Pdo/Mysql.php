@@ -162,23 +162,22 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
         // @todo  use INFORMATION_SCHEMA someday when MySQL's
         // implementation has reasonably good performance and
         // the version with this improvement is in wide use.
-
         if ($schemaName) {
-            $sql = 'DESCRIBE ' . $this->quoteIdentifier("$schemaName.$tableName", true);
+            $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier("$schemaName.$tableName", true);
         } else {
-            $sql = 'DESCRIBE ' . $this->quoteIdentifier($tableName, true);
+            $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier($tableName, true);
         }
         $stmt = $this->query($sql);
-
-        // Use FETCH_NUM so we are not dependent on the CASE attribute of the PDO connection
         $result = $stmt->fetchAll(Zend_Db::FETCH_NUM);
 
         $field   = 0;
         $type    = 1;
-        $null    = 2;
-        $key     = 3;
-        $default = 4;
-        $extra   = 5;
+        $collation = 2;
+        $null    = 3;
+        $key     = 4;
+        $default = 5;
+        $extra   = 6;
+        $comment = 8;
 
         $desc = array();
         $i = 1;
@@ -218,6 +217,15 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
                 }
                 ++$p;
             }
+            $commentValue = null;
+            if($row[$comment]){
+                $commentValue = $row[$comment];
+            }
+            $collationValue = null;
+            if($row[$collation]){
+                $collationValue = $row[$collation];
+            }
+
             $desc[$this->foldCase($row[$field])] = array(
                 'SCHEMA_NAME'      => null, // @todo
                 'TABLE_NAME'       => $this->foldCase($tableName),
@@ -232,7 +240,9 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
                 'UNSIGNED'         => $unsigned,
                 'PRIMARY'          => $primary,
                 'PRIMARY_POSITION' => $primaryPosition,
-                'IDENTITY'         => $identity
+                'IDENTITY'         => $identity,
+                'COMMENT'          => $commentValue,
+                'COLLATION'        => $collationValue
             );
             ++$i;
         }
