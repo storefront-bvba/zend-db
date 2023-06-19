@@ -65,9 +65,9 @@ class Zend_Db
     /**
      * Use the INT_TYPE, BIGINT_TYPE, and FLOAT_TYPE with the quote() method.
      */
-    const INT_TYPE    = 0;
+    const INT_TYPE = 0;
     const BIGINT_TYPE = 1;
-    const FLOAT_TYPE  = 2;
+    const FLOAT_TYPE = 2;
 
     /**
      * PDO constant values discovered by this script result:
@@ -191,12 +191,12 @@ class Zend_Db
      * If the first argument is of type Zend_Config, it is assumed to contain
      * all parameters, and the second argument is ignored.
      *
-     * @param  mixed $adapter String name of base adapter class, or Zend_Config object.
-     * @param  mixed $config  OPTIONAL; an array or Zend_Config object with adapter parameters.
+     * @param mixed $adapter String name of base adapter class, or Zend_Config object.
+     * @param mixed $config OPTIONAL; an array or Zend_Config object with adapter parameters.
      * @return Zend_Db_Adapter_Abstract
      * @throws Zend_Db_Exception
      */
-    public static function factory($adapter, $config = array())
+    public static function factory($adapter, $config = [])
     {
         if ($config instanceof Zend_Config) {
             $config = $config->toArray();
@@ -211,7 +211,7 @@ class Zend_Db
                 $config = $adapter->params->toArray();
             }
             if (isset($adapter->adapter)) {
-                $adapter = (string) $adapter->adapter;
+                $adapter = (string)$adapter->adapter;
             } else {
                 $adapter = null;
             }
@@ -224,7 +224,7 @@ class Zend_Db
             /**
              * @see Zend_Db_Exception
              */
-            // require_once 'Zend/Db/Exception.php';
+            #require_once 'Zend/Db/Exception.php';
             throw new Zend_Db_Exception('Adapter parameters must be in an array or a Zend_Config object');
         }
 
@@ -235,7 +235,7 @@ class Zend_Db
             /**
              * @see Zend_Db_Exception
              */
-            // require_once 'Zend/Db/Exception.php';
+            #require_once 'Zend/Db/Exception.php';
             throw new Zend_Db_Exception('Adapter name must be specified in a string');
         }
 
@@ -255,6 +255,15 @@ class Zend_Db
         $adapterName .= str_replace(' ', '_', ucwords(str_replace('_', ' ', strtolower($adapter))));
 
         /*
+         * Load the adapter class.  This throws an exception
+         * if the specified class cannot be loaded.
+         */
+        if (!class_exists($adapterName)) {
+            #require_once 'Zend/Loader.php';
+            Zend_Loader::loadClass($adapterName);
+        }
+
+        /*
          * Create an instance of the adapter class.
          * Pass the config to the adapter class constructor.
          */
@@ -263,11 +272,11 @@ class Zend_Db
         /*
          * Verify that the object created is a descendent of the abstract adapter type.
          */
-        if (! $dbAdapter instanceof Zend_Db_Adapter_Abstract) {
+        if (!$dbAdapter instanceof Zend_Db_Adapter_Abstract) {
             /**
              * @see Zend_Db_Exception
              */
-            // require_once 'Zend/Db/Exception.php';
+            #require_once 'Zend/Db/Exception.php';
             throw new Zend_Db_Exception("Adapter class '$adapterName' does not extend Zend_Db_Adapter_Abstract");
         }
 

@@ -15,20 +15,20 @@
  * @category   Zend
  * @package    Zend_Db
  * @subpackage Statement
- * @copyright  Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id$
+ * @version    $Id: Statement.php 20096 2010-01-06 02:05:09Z bkarwin $
  */
 
 /**
  * @see Zend_Db
  */
-// require_once 'Zend/Db.php';
+#require_once 'Zend/Db.php';
 
 /**
  * @see Zend_Db_Statement_Interface
  */
-// require_once 'Zend/Db/Statement/Interface.php';
+#require_once 'Zend/Db/Statement/Interface.php';
 
 /**
  * Abstract class to emulate a PDOStatement for native database adapters.
@@ -36,14 +36,14 @@
  * @category   Zend
  * @package    Zend_Db
  * @subpackage Statement
- * @copyright  Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
 {
 
     /**
-     * @var resource|object The driver level statement object/resource
+     * @var PDOStatement|resource|object The driver level statement object/resource
      */
     protected $_stmt = null;
 
@@ -64,35 +64,35 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
      *
      * @var array
      */
-    protected $_attribute = array();
+    protected $_attribute = [];
 
     /**
      * Column result bindings.
      *
      * @var array
      */
-    protected $_bindColumn = array();
+    protected $_bindColumn = [];
 
     /**
      * Query parameter bindings; covers bindParam() and bindValue().
      *
      * @var array
      */
-    protected $_bindParam = array();
+    protected $_bindParam = [];
 
     /**
      * SQL string split into an array at placeholders.
      *
      * @var array
      */
-    protected $_sqlSplit = array();
+    protected $_sqlSplit = [];
 
     /**
      * Parameter placeholders in the SQL string by position in the split array.
      *
      * @var array
      */
-    protected $_sqlParam = array();
+    protected $_sqlParam = [];
 
     /**
      * @var Zend_Db_Profiler_Query
@@ -138,17 +138,17 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
 
         // split into text and params
         $this->_sqlSplit = preg_split('/(\?|\:[a-zA-Z0-9_]+)/',
-            $sql, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+            $sql, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
         // map params
-        $this->_sqlParam = array();
+        $this->_sqlParam = [];
         foreach ($this->_sqlSplit as $key => $val) {
             if ($val == '?') {
                 if ($this->_adapter->supportsParameters('positional') === false) {
                     /**
                      * @see Zend_Db_Statement_Exception
                      */
-                    // require_once 'Zend/Db/Statement/Exception.php';
+                    #require_once 'Zend/Db/Statement/Exception.php';
                     throw new Zend_Db_Statement_Exception("Invalid bind-variable position '$val'");
                 }
             } else if ($val[0] == ':') {
@@ -156,7 +156,7 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
                     /**
                      * @see Zend_Db_Statement_Exception
                      */
-                    // require_once 'Zend/Db/Statement/Exception.php';
+                    #require_once 'Zend/Db/Statement/Exception.php';
                     throw new Zend_Db_Statement_Exception("Invalid bind-variable name '$val'");
                 }
             }
@@ -164,7 +164,7 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
         }
 
         // set up for binding
-        $this->_bindParam = array();
+        $this->_bindParam = [];
     }
 
     /**
@@ -176,40 +176,28 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
      */
     protected function _stripQuoted($sql)
     {
-
-        // get the character for value quoting
-        // this should be '
-        $q = $this->_adapter->quote('a');
-        $q = $q[0];        
-        // get the value used as an escaped quote,
-        // e.g. \' or ''
-        $qe = $this->_adapter->quote($q);
-        $qe = substr($qe, 1, 2);
-        $qe = preg_quote($qe);
-        $escapeChar = substr($qe,0,1);
-        // remove 'foo\'bar'
-        if (!empty($q)) {
-            $escapeChar = preg_quote($escapeChar);
-            // this segfaults only after 65,000 characters instead of 9,000
-            $sql = preg_replace("/$q([^$q{$escapeChar}]*|($qe)*)*$q/s", '', $sql);
-        }
-        
-        // get a version of the SQL statement with all quoted
-        // values and delimited identifiers stripped out
-        // remove "foo\"bar"
-        $sql = preg_replace("/\"(\\\\\"|[^\"])*\"/Us", '', $sql);
-
         // get the character for delimited id quotes,
         // this is usually " but in MySQL is `
         $d = $this->_adapter->quoteIdentifier('a');
         $d = $d[0];
-        // get the value used as an escaped delimited id quote,
-        // e.g. \" or "" or \`
-        $de = $this->_adapter->quoteIdentifier($d);
-        $de = substr($de, 1, 2);
-        $de = preg_quote($de);
-        // Note: $de and $d where never used..., now they are:
-        $sql = preg_replace("/$d($de|\\\\{2}|[^$d])*$d/Us", '', $sql);
+
+        // get the character for value quoting
+        // this should be '
+        $q = $this->_adapter->quote('a');
+        $q = $q[0];
+
+        // get a version of the SQL statement with all quoted
+        // values and delimited identifiers stripped out
+        // remove quoted identifiers
+        if (!empty($d)) {
+            $rx = "{$d}.*?(?<!(((?<![{$d}\\\\]){$d})|((?<!\\\\)\\\\))){$d}(?!{$d})";
+            $sql = preg_replace("/$rx/Us", '', $sql);
+        }
+        // remove quoted values
+        if (!empty($q)) {
+            $rx = "{$q}.*?(?<!(((?<![{$q}\\\\]){$q})|((?<!\\\\)\\\\))){$q}(?!{$q})";
+            $sql = preg_replace("/$rx/Us", '', $sql);
+        }
         return $sql;
     }
 
@@ -218,8 +206,8 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
      *
      * @param string $column Name the column in the result set, either by
      *                       position or by name.
-     * @param mixed  $param  Reference to the PHP variable containing the value.
-     * @param mixed  $type   OPTIONAL
+     * @param mixed $param Reference to the PHP variable containing the value.
+     * @param mixed $type OPTIONAL
      * @return bool
      */
     public function bindColumn($column, &$param, $type = null)
@@ -232,10 +220,10 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
      * Binds a parameter to the specified variable name.
      *
      * @param mixed $parameter Name the parameter, either integer or string.
-     * @param mixed $variable  Reference to PHP variable containing the value.
-     * @param mixed $type      OPTIONAL Datatype of SQL parameter.
-     * @param mixed $length    OPTIONAL Length of SQL parameter.
-     * @param mixed $options   OPTIONAL Other options.
+     * @param mixed $variable Reference to PHP variable containing the value.
+     * @param mixed $type OPTIONAL Datatype of SQL parameter.
+     * @param mixed $length OPTIONAL Length of SQL parameter.
+     * @param mixed $options OPTIONAL Other options.
      * @return bool
      */
     public function bindParam($parameter, &$variable, $type = null, $length = null, $options = null)
@@ -244,12 +232,12 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
             /**
              * @see Zend_Db_Statement_Exception
              */
-            // require_once 'Zend/Db/Statement/Exception.php';
+            #require_once 'Zend/Db/Statement/Exception.php';
             throw new Zend_Db_Statement_Exception('Invalid bind-variable position');
         }
 
         $position = null;
-        if (($intval = (int) $parameter) > 0 && $this->_adapter->supportsParameters('positional')) {
+        if (($intval = (int)$parameter) > 0 && $this->_adapter->supportsParameters('positional')) {
             if ($intval >= 1 || $intval <= count($this->_sqlParam)) {
                 $position = $intval;
             }
@@ -266,7 +254,7 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
             /**
              * @see Zend_Db_Statement_Exception
              */
-            // require_once 'Zend/Db/Statement/Exception.php';
+            #require_once 'Zend/Db/Statement/Exception.php';
             throw new Zend_Db_Statement_Exception("Invalid bind-variable position '$parameter'");
         }
 
@@ -279,8 +267,8 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
      * Binds a value to a parameter.
      *
      * @param mixed $parameter Name the parameter, either integer or string.
-     * @param mixed $value     Scalar value to bind to the parameter.
-     * @param mixed $type      OPTIONAL Datatype of the parameter.
+     * @param mixed $value Scalar value to bind to the parameter.
+     * @param mixed $type OPTIONAL Datatype of the parameter.
      * @return bool
      */
     public function bindValue($parameter, $value, $type = null)
@@ -331,12 +319,12 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
      * Returns an array containing all of the result set rows.
      *
      * @param int $style OPTIONAL Fetch mode.
-     * @param int $col   OPTIONAL Column number, if fetch mode is by column.
+     * @param int $col OPTIONAL Column number, if fetch mode is by column.
      * @return array Collection of rows, each in a format by the fetch mode.
      */
     public function fetchAll($style = null, $col = null)
     {
-        $data = array();
+        $data = [];
         if ($style === Zend_Db::FETCH_COLUMN && $col === null) {
             $col = 0;
         }
@@ -360,8 +348,8 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
      */
     public function fetchColumn($col = 0)
     {
-        $data = array();
-        $col = (int) $col;
+        $data = [];
+        $col = (int)$col;
         $row = $this->fetch(Zend_Db::FETCH_NUM);
         if (!is_array($row)) {
             return false;
@@ -372,11 +360,11 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
     /**
      * Fetches the next row and returns it as an object.
      *
-     * @param string $class  OPTIONAL Name of the class to create.
-     * @param array  $config OPTIONAL Constructor arguments for the class.
+     * @param string $class OPTIONAL Name of the class to create.
+     * @param array $config OPTIONAL Constructor arguments for the class.
      * @return mixed One object instance of the specified class, or false.
      */
-    public function fetchObject($class = 'stdClass', array $config = array())
+    public function fetchObject($class = 'stdClass', array $config = [])
     {
         $obj = new $class($config);
         $row = $this->fetch(Zend_Db::FETCH_ASSOC);
@@ -406,7 +394,7 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
      * Set a statement attribute.
      *
      * @param string $key Attribute name.
-     * @param mixed  $val Attribute value.
+     * @param mixed $val Attribute value.
      * @return bool
      */
     public function setAttribute($key, $val)
@@ -417,7 +405,7 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
     /**
      * Set the default fetch mode for this statement.
      *
-     * @param int   $mode The fetch mode.
+     * @param int $mode The fetch mode.
      * @return bool
      * @throws Zend_Db_Statement_Exception
      */
@@ -436,7 +424,7 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
                 /**
                  * @see Zend_Db_Statement_Exception
                  */
-                // require_once 'Zend/Db/Statement/Exception.php';
+                #require_once 'Zend/Db/Statement/Exception.php';
                 throw new Zend_Db_Statement_Exception('invalid fetch mode');
                 break;
         }

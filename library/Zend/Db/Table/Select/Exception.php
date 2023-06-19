@@ -23,7 +23,7 @@
 /**
  * Zend_Db_Exception
  */
-// require_once 'Zend/Db/Select/Exception.php';
+#require_once 'Zend/Db/Select/Exception.php';
 
 /**
  * @category   Zend
@@ -32,7 +32,6 @@
  * @copyright  Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-
 class Zend_Db_Table_Select_Exception extends Zend_Db_Select_Exception
 {
 }

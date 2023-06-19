@@ -24,7 +24,7 @@
 /**
  * @see Zend_Db_Adapter_Pdo_Abstract
  */
-// require_once 'Zend/Db/Adapter/Pdo/Abstract.php';
+#require_once 'Zend/Db/Adapter/Pdo/Abstract.php';
 
 
 /**
@@ -57,24 +57,24 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
      *
      * @var array Associative array of datatypes to values 0, 1, or 2.
      */
-    protected $_numericDataTypes = array(
-        Zend_Db::INT_TYPE    => Zend_Db::INT_TYPE,
+    protected $_numericDataTypes = [
+        Zend_Db::INT_TYPE => Zend_Db::INT_TYPE,
         Zend_Db::BIGINT_TYPE => Zend_Db::BIGINT_TYPE,
-        Zend_Db::FLOAT_TYPE  => Zend_Db::FLOAT_TYPE,
-        'INT'                => Zend_Db::INT_TYPE,
-        'INTEGER'            => Zend_Db::INT_TYPE,
-        'MEDIUMINT'          => Zend_Db::INT_TYPE,
-        'SMALLINT'           => Zend_Db::INT_TYPE,
-        'TINYINT'            => Zend_Db::INT_TYPE,
-        'BIGINT'             => Zend_Db::BIGINT_TYPE,
-        'SERIAL'             => Zend_Db::BIGINT_TYPE,
-        'DEC'                => Zend_Db::FLOAT_TYPE,
-        'DECIMAL'            => Zend_Db::FLOAT_TYPE,
-        'DOUBLE'             => Zend_Db::FLOAT_TYPE,
-        'DOUBLE PRECISION'   => Zend_Db::FLOAT_TYPE,
-        'FIXED'              => Zend_Db::FLOAT_TYPE,
-        'FLOAT'              => Zend_Db::FLOAT_TYPE
-    );
+        Zend_Db::FLOAT_TYPE => Zend_Db::FLOAT_TYPE,
+        'INT' => Zend_Db::INT_TYPE,
+        'INTEGER' => Zend_Db::INT_TYPE,
+        'MEDIUMINT' => Zend_Db::INT_TYPE,
+        'SMALLINT' => Zend_Db::INT_TYPE,
+        'TINYINT' => Zend_Db::INT_TYPE,
+        'BIGINT' => Zend_Db::BIGINT_TYPE,
+        'SERIAL' => Zend_Db::BIGINT_TYPE,
+        'DEC' => Zend_Db::FLOAT_TYPE,
+        'DECIMAL' => Zend_Db::FLOAT_TYPE,
+        'DOUBLE' => Zend_Db::FLOAT_TYPE,
+        'DOUBLE PRECISION' => Zend_Db::FLOAT_TYPE,
+        'FIXED' => Zend_Db::FLOAT_TYPE,
+        'FLOAT' => Zend_Db::FLOAT_TYPE
+    ];
 
     /**
      * Override _dsn() and ensure that charset is incorporated in mysql
@@ -88,7 +88,7 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
         }
         return $dsn;
     }
-    
+
     /**
      * Creates a PDO object and connects to the database.
      *
@@ -152,98 +152,78 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
      * PRIMARY          => boolean; true if column is part of the primary key
      * PRIMARY_POSITION => integer; position of column in primary key
      * IDENTITY         => integer; true if column is auto-generated with unique values
-     *
-     * @param string $tableName
-     * @param string $schemaName OPTIONAL
-     * @return array
+     * COMMENT          => string
      */
-    public function describeTable($tableName, $schemaName = null)
+    public function describeTable(string $tableName, string $schemaName = null): array
     {
-        // @todo  use INFORMATION_SCHEMA someday when MySQL's
-        // implementation has reasonably good performance and
-        // the version with this improvement is in wide use.
         if ($schemaName) {
-            $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier("$schemaName.$tableName", true);
+            $sql = 'show full columns from ' . $this->quoteIdentifier("$schemaName.$tableName", true);
         } else {
-            $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier($tableName, true);
+            $sql = 'show full columns from ' . $this->quoteIdentifier($tableName, true);
         }
-        $stmt = $this->query($sql);
-        $result = $stmt->fetchAll(Zend_Db::FETCH_NUM);
 
-        $field   = 0;
-        $type    = 1;
-        $collation = 2;
-        $null    = 3;
-        $key     = 4;
-        $default = 5;
-        $extra   = 6;
-        $comment = 8;
+        // Use FETCH_NUM, so we are not dependent on the CASE attribute of the PDO connection
+        $result = $this->fetchAll($sql);
 
-        $desc = array();
+        $desc = [];
         $i = 1;
         $p = 1;
         foreach ($result as $row) {
             list($length, $scale, $precision, $unsigned, $primary, $primaryPosition, $identity)
-                = array(null, null, null, null, false, null, false);
-            if (preg_match('/unsigned/', $row[$type])) {
+                = [null, null, null, null, false, null, false];
+            if (str_contains($row['Type'], 'unsigned')) {
                 $unsigned = true;
             }
-            if (preg_match('/^((?:var)?char)\((\d+)\)/', $row[$type], $matches)) {
-                $row[$type] = $matches[1];
+            if (preg_match('/^((?:var)?char)\((\d+)\)/', $row['Type'], $matches)) {
+                $row['Type'] = $matches[1];
                 $length = $matches[2];
-            } else if (preg_match('/^decimal\((\d+),(\d+)\)/', $row[$type], $matches)) {
-                $row[$type] = 'decimal';
+            } else if (preg_match('/^decimal\((\d+),(\d+)\)/', $row['Type'], $matches)) {
+                $row['Type'] = 'decimal';
                 $precision = $matches[1];
                 $scale = $matches[2];
-            } else if (preg_match('/^float\((\d+),(\d+)\)/', $row[$type], $matches)) {
-                $row[$type] = 'float';
+            } else if (preg_match('/^float\((\d+),(\d+)\)/', $row['Type'], $matches)) {
+                $row['Type'] = 'float';
                 $precision = $matches[1];
                 $scale = $matches[2];
-            } else if (preg_match('/^((?:big|medium|small|tiny)?int)\((\d+)\)/', $row[$type], $matches)) {
-                $row[$type] = $matches[1];
+            } else if (preg_match('/^((?:big|medium|small|tiny)?int)\((\d+)\)/', $row['Type'], $matches)) {
+                $row['Type'] = $matches[1];
                 // The optional argument of a MySQL int type is not precision
                 // or length; it is only a hint for display width.
-
-                // WOUTER: This line is the only change we made in this method
-                $length = $matches[2];
             }
-            if (strtoupper($row[$key]) == 'PRI') {
+            if (strtoupper($row['Key']) === 'PRI') {
                 $primary = true;
                 $primaryPosition = $p;
-                if ($row[$extra] == 'auto_increment') {
+                if ($row['Extra'] === 'auto_increment') {
                     $identity = true;
                 } else {
                     $identity = false;
                 }
                 ++$p;
             }
-            $commentValue = null;
-            if($row[$comment]){
-                $commentValue = $row[$comment];
-            }
-            $collationValue = null;
-            if($row[$collation]){
-                $collationValue = $row[$collation];
+
+            $extra = $row['Extra'] ?? null;
+            if ($extra === '') {
+                $extra = null;
             }
 
-            $desc[$this->foldCase($row[$field])] = array(
-                'SCHEMA_NAME'      => null, // @todo
-                'TABLE_NAME'       => $this->foldCase($tableName),
-                'COLUMN_NAME'      => $this->foldCase($row[$field]),
-                'COLUMN_POSITION'  => $i,
-                'DATA_TYPE'        => $row[$type],
-                'DEFAULT'          => $row[$default],
-                'NULLABLE'         => (bool) ($row[$null] == 'YES'),
-                'LENGTH'           => $length,
-                'SCALE'            => $scale,
-                'PRECISION'        => $precision,
-                'UNSIGNED'         => $unsigned,
-                'PRIMARY'          => $primary,
+            $desc[$this->foldCase($row['Field'])] = [
+                'SCHEMA_NAME' => null,
+                'TABLE_NAME' => $this->foldCase($tableName),
+                'COLUMN_NAME' => $this->foldCase($row['Field']),
+                'COLUMN_POSITION' => $i,
+                'DATA_TYPE' => $row['Type'],
+                'DEFAULT' => $row['Default'],
+                'NULLABLE' => $row['Null'] === 'YES',
+                'LENGTH' => $length,
+                'SCALE' => $scale,
+                'PRECISION' => $precision,
+                'UNSIGNED' => $unsigned,
+                'PRIMARY' => $primary,
                 'PRIMARY_POSITION' => $primaryPosition,
-                'IDENTITY'         => $identity,
-                'COMMENT'          => $commentValue,
-                'COLLATION'        => $collationValue
-            );
+                'IDENTITY' => $identity,
+                'EXTRA' => $extra,
+                'COMMENT' => $row['Comment']
+            ];
             ++$i;
         }
         return $desc;
@@ -252,25 +232,25 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
     /**
      * Adds an adapter-specific LIMIT clause to the SELECT statement.
      *
-     * @param  string $sql
-     * @param  integer $count
-     * @param  integer $offset OPTIONAL
-     * @throws Zend_Db_Adapter_Exception
+     * @param string $sql
+     * @param integer $count
+     * @param integer $offset OPTIONAL
      * @return string
+     * @throws Zend_Db_Adapter_Exception
      */
-     public function limit($sql, $count, $offset = 0)
-     {
+    public function limit($sql, $count, $offset = 0)
+    {
         $count = intval($count);
         if ($count <= 0) {
             /** @see Zend_Db_Adapter_Exception */
-            // require_once 'Zend/Db/Adapter/Exception.php';
+            #require_once 'Zend/Db/Adapter/Exception.php';
             throw new Zend_Db_Adapter_Exception("LIMIT argument count=$count is not valid");
         }
 
         $offset = intval($offset);
         if ($offset < 0) {
             /** @see Zend_Db_Adapter_Exception */
-            // require_once 'Zend/Db/Adapter/Exception.php';
+            #require_once 'Zend/Db/Adapter/Exception.php';
             throw new Zend_Db_Adapter_Exception("LIMIT argument offset=$offset is not valid");
         }
 
