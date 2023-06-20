@@ -220,13 +220,10 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
      * Rewind the Iterator to the first element.
      * Similar to the reset() function for arrays in PHP.
      * Required by interface Iterator.
-     *
-     * @return Zend_Db_Table_Rowset_Abstract Fluent interface.
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->_pointer = 0;
-        return $this;
     }
 
     /**
@@ -236,7 +233,7 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
      *
      * @return Zend_Db_Table_Row_Abstract current element from the collection
      */
-    public function current()
+    public function current(): mixed
     {
         if ($this->valid() === false) {
             return null;
@@ -250,10 +247,8 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
      * Return the identifying key of the current element.
      * Similar to the key() function for arrays in PHP.
      * Required by interface Iterator.
-     *
-     * @return int
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->_pointer;
     }
@@ -262,10 +257,8 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
      * Move forward to next element.
      * Similar to the next() function for arrays in PHP.
      * Required by interface Iterator.
-     *
-     * @return void
      */
-    public function next()
+    public function next(): void
     {
         ++$this->_pointer;
     }
@@ -274,10 +267,8 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
      * Check if there is a current element after calls to rewind() or next().
      * Used to check if we've iterated to the end of the collection.
      * Required by interface Iterator.
-     *
-     * @return bool False if there's nothing more to iterate over
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->_pointer >= 0 && $this->_pointer < $this->_count;
     }
@@ -286,10 +277,8 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
      * Returns the number of elements in the collection.
      *
      * Implements Countable::count()
-     *
-     * @return int
      */
-    public function count()
+    public function count(): int
     {
         return $this->_count;
     }
@@ -299,10 +288,9 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
      * Required by interface SeekableIterator.
      *
      * @param int $position the position to seek to
-     * @return Zend_Db_Table_Rowset_Abstract
      * @throws Zend_Db_Table_Rowset_Exception
      */
-    public function seek($position)
+    public function seek($position): void
     {
         $position = (int)$position;
         if ($position < 0 || $position >= $this->_count) {
@@ -310,7 +298,6 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
             throw new Zend_Db_Table_Rowset_Exception("Illegal index $position");
         }
         $this->_pointer = $position;
-        return $this;
     }
 
     /**
