@@ -23,12 +23,12 @@
 /**
  * @see Zend_Db_Table_Abstract
  */
-#require_once 'Zend/Db/Table/Abstract.php';
+
 
 /**
  * @see Zend_Db_Table_Definition
  */
-#require_once 'Zend/Db/Table/Definition.php';
+
 
 /**
  * Class for SQL table interface.
@@ -45,8 +45,7 @@ class Zend_Db_Table extends Zend_Db_Table_Abstract
     /**
      * __construct() - For concrete implementation of Zend_Db_Table
      *
-     * @param string|array $config string can reference a Zend_Registry key for a db adapter
-     *                             OR it can reference the name of a table
+     * @param string|array $config string is the name of a table
      * @param array|Zend_Db_Table_Definition $definition
      */
     public function __construct($config = [], $definition = null)

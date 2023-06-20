@@ -23,17 +23,17 @@
 /**
  * @see Zend_Db_Adapter_Abstract
  */
-#require_once 'Zend/Db/Adapter/Abstract.php';
+
 
 /**
  * @see Zend_Db_Adapter_Abstract
  */
-#require_once 'Zend/Db/Select.php';
+
 
 /**
  * @see Zend_Db
  */
-#require_once 'Zend/Db.php';
+
 
 /**
  * Class for SQL table interface.
@@ -600,7 +600,7 @@ abstract class Zend_Db_Table_Abstract
 
     /**
      * @param mixed $db Either an Adapter object, or a string naming a Registry key
-     * @return Zend_Db_Adapter_Abstract
+     * @return Zend_Db_Adapter_Abstract | null
      * @throws Zend_Db_Table_Exception
      */
     protected static function _setupAdapter($db)
@@ -609,7 +609,6 @@ abstract class Zend_Db_Table_Abstract
             return null;
         }
         if (!$db instanceof Zend_Db_Adapter_Abstract) {
-            #require_once 'Zend/Db/Table/Exception.php';
             throw new Zend_Db_Table_Exception('Argument must be of type Zend_Db_Adapter_Abstract, or a Registry key where a Zend_Db_Adapter_Abstract object is stored');
         }
         return $db;
@@ -700,11 +699,11 @@ abstract class Zend_Db_Table_Abstract
             return null;
         }
         if (is_string($metadataCache)) {
-            #require_once 'Zend/Registry.php';
+            
             $metadataCache = Zend_Registry::get($metadataCache);
         }
         if (!$metadataCache instanceof Zend_Cache_Core) {
-            #require_once 'Zend/Db/Table/Exception.php';
+            
             throw new Zend_Db_Table_Exception('Argument must be of type Zend_Cache_Core, or a Registry key where a Zend_Cache_Core object is stored');
         }
         return $metadataCache;
@@ -753,7 +752,7 @@ abstract class Zend_Db_Table_Abstract
         if (!$this->_db) {
             $this->_db = self::getDefaultAdapter();
             if (!$this->_db instanceof Zend_Db_Adapter_Abstract) {
-                #require_once 'Zend/Db/Table/Exception.php';
+                
                 throw new Zend_Db_Table_Exception('No adapter found for ' . get_class($this));
             }
         }
@@ -877,7 +876,7 @@ abstract class Zend_Db_Table_Abstract
                 // if no primary key was specified and none was found in the metadata
                 // then throw an exception.
                 if (empty($this->_primary)) {
-                    #require_once 'Zend/Db/Table/Exception.php';
+                    
                     throw new Zend_Db_Table_Exception("A table must have a primary key, but none was found for table '{$this->_name}'");
                 }
             } else {
@@ -992,7 +991,7 @@ abstract class Zend_Db_Table_Abstract
         }
 
         if (!array_key_exists($key, $info)) {
-            #require_once 'Zend/Db/Table/Exception.php';
+            
             throw new Zend_Db_Table_Exception('There is no table information for the key "' . $key . '"');
         }
 
@@ -1007,7 +1006,7 @@ abstract class Zend_Db_Table_Abstract
      */
     public function select($withFromPart = self::SELECT_WITHOUT_FROM_PART)
     {
-        #require_once 'Zend/Db/Table/Select.php';
+        
         $select = new Zend_Db_Table_Select($this);
         if ($withFromPart == self::SELECT_WITH_FROM_PART) {
             $select->from($this->info(self::NAME), Zend_Db_Table_Select::SQL_WILDCARD, $this->info(self::SCHEMA));
@@ -1104,7 +1103,7 @@ abstract class Zend_Db_Table_Abstract
             /**
              * @see Zend_Db_Table_Exception
              */
-            #require_once 'Zend/Db/Table/Exception.php';
+            
 
             throw new Zend_Db_Table_Exception('Column "' . $column . '" not found in table.');
         }
@@ -1286,12 +1285,12 @@ abstract class Zend_Db_Table_Abstract
         $keyNames = array_values((array)$this->_primary);
 
         if (count($args) < count($keyNames)) {
-            #require_once 'Zend/Db/Table/Exception.php';
+            
             throw new Zend_Db_Table_Exception("Too few columns for the primary key");
         }
 
         if (count($args) > count($keyNames)) {
-            #require_once 'Zend/Db/Table/Exception.php';
+            
             throw new Zend_Db_Table_Exception("Too many columns for the primary key");
         }
 
@@ -1309,7 +1308,7 @@ abstract class Zend_Db_Table_Abstract
                 $numberTerms = $keyValuesCount;
             } else {
                 if ($keyValuesCount != $numberTerms) {
-                    #require_once 'Zend/Db/Table/Exception.php';
+                    
                     throw new Zend_Db_Table_Exception("Missing value(s) for the primary key");
                 }
             }
@@ -1346,7 +1345,7 @@ abstract class Zend_Db_Table_Abstract
         if ($whereClause == null) {
             $rowsetClass = $this->getRowsetClass();
             if (!class_exists($rowsetClass)) {
-                #require_once 'Zend/Loader.php';
+                
                 Zend_Loader::loadClass($rowsetClass);
             }
             return new $rowsetClass(['table' => $this, 'rowClass' => $this->getRowClass(), 'stored' => true]);
@@ -1398,7 +1397,7 @@ abstract class Zend_Db_Table_Abstract
 
         $rowsetClass = $this->getRowsetClass();
         if (!class_exists($rowsetClass)) {
-            #require_once 'Zend/Loader.php';
+            
             Zend_Loader::loadClass($rowsetClass);
         }
         return new $rowsetClass($data);
@@ -1447,7 +1446,7 @@ abstract class Zend_Db_Table_Abstract
 
         $rowClass = $this->getRowClass();
         if (!class_exists($rowClass)) {
-            #require_once 'Zend/Loader.php';
+            
             Zend_Loader::loadClass($rowClass);
         }
         return new $rowClass($data);
@@ -1508,7 +1507,7 @@ abstract class Zend_Db_Table_Abstract
 
         $rowClass = $this->getRowClass();
         if (!class_exists($rowClass)) {
-            #require_once 'Zend/Loader.php';
+            
             Zend_Loader::loadClass($rowClass);
         }
         $row = new $rowClass($config);
@@ -1594,10 +1593,10 @@ abstract class Zend_Db_Table_Abstract
         // assume the tableName is the class name
         if (!class_exists($tableName)) {
             try {
-                #require_once 'Zend/Loader.php';
+                
                 Zend_Loader::loadClass($tableName);
-            } catch (Zend_Exception $e) {
-                #require_once 'Zend/Db/Table/Row/Exception.php';
+             } catch (RuntimeException $e) {
+                
                 throw new Zend_Db_Table_Row_Exception($e->getMessage(), $e->getCode(), $e);
             }
         }
