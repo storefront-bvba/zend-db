@@ -608,10 +608,6 @@ abstract class Zend_Db_Table_Abstract
         if ($db === null) {
             return null;
         }
-        if (is_string($db)) {
-            #require_once 'Zend/Registry.php';
-            $db = Zend_Registry::get($db);
-        }
         if (!$db instanceof Zend_Db_Adapter_Abstract) {
             #require_once 'Zend/Db/Table/Exception.php';
             throw new Zend_Db_Table_Exception('Argument must be of type Zend_Db_Adapter_Abstract, or a Registry key where a Zend_Db_Adapter_Abstract object is stored');
