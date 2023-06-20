@@ -265,7 +265,7 @@ class Zend_Db_Select
             /**
              * @see Zend_Db_Select_Exception
              */
-
+            
             throw new Zend_Db_Select_Exception("No table has been specified for the FROM clause");
         }
 
@@ -294,14 +294,14 @@ class Zend_Db_Select
     public function union($select = [], $type = self::SQL_UNION)
     {
         if (!is_array($select)) {
-
+            
             throw new Zend_Db_Select_Exception(
                 "union() only accepts an array of Zend_Db_Select instances of sql query strings."
             );
         }
 
         if (!in_array($type, self::$_unionTypes)) {
-
+            
             throw new Zend_Db_Select_Exception("Invalid union type '{$type}'");
         }
 
@@ -699,7 +699,7 @@ class Zend_Db_Select
     {
         $part = strtolower($part);
         if (!array_key_exists($part, $this->_parts)) {
-
+            
             throw new Zend_Db_Select_Exception("Invalid Select part '$part'");
         }
         return $this->_parts[$part];
@@ -792,12 +792,12 @@ class Zend_Db_Select
             /**
              * @see Zend_Db_Select_Exception
              */
-
+            
             throw new Zend_Db_Select_Exception("Invalid join type '$type'");
         }
 
         if (count($this->_parts[self::UNION])) {
-
+            
             throw new Zend_Db_Select_Exception("Invalid use of table with " . self::SQL_UNION);
         }
 
@@ -839,7 +839,7 @@ class Zend_Db_Select
                 /**
                  * @see Zend_Db_Select_Exception
                  */
-
+                
                 throw new Zend_Db_Select_Exception(
                     "You cannot define a correlation name '$correlationName' more than once"
                 );
@@ -910,7 +910,7 @@ class Zend_Db_Select
     public function _joinUsing($type, $name, $cond, $cols = '*', $schema = null)
     {
         if (empty($this->_parts[self::FROM])) {
-
+            
             throw new Zend_Db_Select_Exception("You can only perform a joinUsing after specifying a FROM table");
         }
 
@@ -1036,7 +1036,7 @@ class Zend_Db_Select
     protected function _where($condition, $value = null, $type = null, $bool = true)
     {
         if (count($this->_parts[self::UNION])) {
-
+            
             throw new Zend_Db_Select_Exception("Invalid use of where clause with " . self::SQL_UNION);
         }
 
@@ -1358,11 +1358,11 @@ class Zend_Db_Select
             if ($type) {
                 $type .= ' join';
                 if (!in_array($type, self::$_joinTypes)) {
-
+                    
                     throw new Zend_Db_Select_Exception("Unrecognized method '$method()'");
                 }
                 if (in_array($type, [self::CROSS_JOIN, self::NATURAL_JOIN])) {
-
+                    
                     throw new Zend_Db_Select_Exception("Cannot perform a joinUsing with method '$method()'");
                 }
             } else {
@@ -1372,7 +1372,7 @@ class Zend_Db_Select
             return call_user_func_array([$this, '_joinUsing'], $args);
         }
 
-
+        
         throw new Zend_Db_Select_Exception("Unrecognized method '$method()'");
     }
 

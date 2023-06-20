@@ -20,9 +20,6 @@
  * @version    $Id$
  */
 
-/**
- * @see Zend_Db_Statement
- */
 
 
 /**
@@ -57,7 +54,6 @@ class Zend_Db_Statement_Pdo extends Zend_Db_Statement implements IteratorAggrega
         try {
             $this->_stmt = $this->_adapter->getConnection()->prepare($sql);
         } catch (PDOException $e) {
-            
             throw new Zend_Db_Statement_Exception($e->getMessage(), $e->getCode(), $e);
         }
     }

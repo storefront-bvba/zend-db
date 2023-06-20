@@ -472,11 +472,9 @@ abstract class Zend_Db_Table_Abstract
         $refMap = $this->_getReferenceMapNormalized();
         if ($ruleKey !== null) {
             if (!isset($refMap[$ruleKey])) {
-                #require_once "Zend/Db/Table/Exception.php";
                 throw new Zend_Db_Table_Exception("No reference rule \"$ruleKey\" from table $thisClass to table $tableClassname");
             }
             if ($refMap[$ruleKey][self::REF_TABLE_CLASS] != $tableClassname) {
-                #require_once "Zend/Db/Table/Exception.php";
                 throw new Zend_Db_Table_Exception("Reference rule \"$ruleKey\" does not reference table $tableClassname");
             }
             return $refMap[$ruleKey];
@@ -486,7 +484,6 @@ abstract class Zend_Db_Table_Abstract
                 return $reference;
             }
         }
-        #require_once "Zend/Db/Table/Exception.php";
         throw new Zend_Db_Table_Exception("No reference from table $thisClass to table $tableClassname");
     }
 
