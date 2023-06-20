@@ -773,6 +773,10 @@ abstract class Zend_Db_Table_Abstract
         }
     }
 
+    public function getName(): string{
+        return $this->_name;
+    }
+
     /**
      * Initializes metadata.
      *
