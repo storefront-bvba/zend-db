@@ -348,7 +348,6 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
      */
     public function fetchColumn($col = 0)
     {
-        $data = [];
         $col = (int)$col;
         $row = $this->fetch(Zend_Db::FETCH_NUM);
         if (!is_array($row)) {
