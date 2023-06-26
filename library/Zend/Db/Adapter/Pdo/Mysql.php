@@ -26,7 +26,6 @@
  */
 
 
-
 /**
  * Class for connecting to MySQL databases and performing common operations.
  *
@@ -101,9 +100,7 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
             return;
         }
 
-        if (!empty($this->_config['charset'])
-            && version_compare(PHP_VERSION, '5.3.6', '<')
-        ) {
+        if (!empty($this->_config['charset']) && version_compare(PHP_VERSION, '5.3.6', '<')) {
             $initCommand = "SET NAMES '" . $this->_config['charset'] . "'";
             $this->_config['driver_options'][1002] = $initCommand; // 1002 = PDO::MYSQL_ATTR_INIT_COMMAND
         }
@@ -157,63 +154,80 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
     public function describeTable(string $tableName, string $schemaName = null): array
     {
         if ($schemaName) {
-            $sql = 'show full columns from ' . $this->quoteIdentifier("$schemaName.$tableName", true);
+            $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier("$schemaName.$tableName", true);
         } else {
-            $sql = 'show full columns from ' . $this->quoteIdentifier($tableName, true);
+            $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier($tableName, true);
         }
+        $stmt = $this->query($sql);
+        $result = $stmt->fetchAll(Zend_Db::FETCH_NUM);
 
-        // Use FETCH_NUM, so we are not dependent on the CASE attribute of the PDO connection
-        $result = $this->fetchAll($sql);
+        $field = 0;
+        $type = 1;
+        $collation = 2;
+        $null = 3;
+        $key = 4;
+        $default = 5;
+        $extra = 6;
+        $comment = 8;
 
-        $desc = [];
+        $desc = array();
         $i = 1;
         $p = 1;
         foreach ($result as $row) {
-            list($length, $scale, $precision, $unsigned, $primary, $primaryPosition, $identity)
-                = [null, null, null, null, false, null, false];
-            if (str_contains($row['Type'], 'unsigned')) {
+            list(
+                $length, $scale, $precision, $unsigned, $primary, $primaryPosition, $identity
+                ) = array(null, null, null, null, false, null, false);
+            if (preg_match('/unsigned/', $row[$type])) {
                 $unsigned = true;
             }
-            if (preg_match('/^((?:var)?char)\((\d+)\)/', $row['Type'], $matches)) {
-                $row['Type'] = $matches[1];
+            if (preg_match('/^((?:var)?char)\((\d+)\)/', $row[$type], $matches)) {
+                $row[$type] = $matches[1];
                 $length = $matches[2];
-            } else if (preg_match('/^decimal\((\d+),(\d+)\)/', $row['Type'], $matches)) {
-                $row['Type'] = 'decimal';
+            } elseif (preg_match('/^decimal\((\d+),(\d+)\)/', $row[$type], $matches)) {
+                $row[$type] = 'decimal';
                 $precision = $matches[1];
                 $scale = $matches[2];
-            } else if (preg_match('/^float\((\d+),(\d+)\)/', $row['Type'], $matches)) {
-                $row['Type'] = 'float';
+            } elseif (preg_match('/^float\((\d+),(\d+)\)/', $row[$type], $matches)) {
+                $row[$type] = 'float';
                 $precision = $matches[1];
                 $scale = $matches[2];
-            } else if (preg_match('/^((?:big|medium|small|tiny)?int)\((\d+)\)/', $row['Type'], $matches)) {
-                $row['Type'] = $matches[1];
+            } elseif (preg_match('/^((?:big|medium|small|tiny)?int)\((\d+)\)/', $row[$type], $matches)) {
+                $row[$type] = $matches[1];
                 // The optional argument of a MySQL int type is not precision
                 // or length; it is only a hint for display width.
+
+                // WOUTER: This line is the only change we made in this method
+                $length = $matches[2];
             }
-            if (strtoupper($row['Key']) === 'PRI') {
+            if (strtoupper($row[$key]) === 'PRI') {
                 $primary = true;
                 $primaryPosition = $p;
-                if ($row['Extra'] === 'auto_increment') {
+                if ($row[$extra] === 'auto_increment') {
                     $identity = true;
                 } else {
                     $identity = false;
                 }
                 ++$p;
             }
-
-            $extra = $row['Extra'] ?? null;
-            if ($extra === '') {
-                $extra = null;
+            $commentValue = null;
+            if ($row[$comment]) {
+                $commentValue = $row[$comment];
+            }
+            $collationValue = null;
+            if ($row[$collation]) {
+                $collationValue = $row[$collation];
             }
 
-            $desc[$this->foldCase($row['Field'])] = [
-                'SCHEMA_NAME' => null,
+            $extraValue = $row[$extra];
+
+            $desc[$this->foldCase($row[$field])] = array(
+                'SCHEMA_NAME' => null, // @todo
                 'TABLE_NAME' => $this->foldCase($tableName),
-                'COLUMN_NAME' => $this->foldCase($row['Field']),
+                'COLUMN_NAME' => $this->foldCase($row[$field]),
                 'COLUMN_POSITION' => $i,
-                'DATA_TYPE' => $row['Type'],
-                'DEFAULT' => $row['Default'],
-                'NULLABLE' => $row['Null'] === 'YES',
+                'DATA_TYPE' => $row[$type],
+                'DEFAULT' => $row[$default],
+                'NULLABLE' => (bool)($row[$null] == 'YES'),
                 'LENGTH' => $length,
                 'SCALE' => $scale,
                 'PRECISION' => $precision,
@@ -221,9 +235,10 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
                 'PRIMARY' => $primary,
                 'PRIMARY_POSITION' => $primaryPosition,
                 'IDENTITY' => $identity,
-                'EXTRA' => $extra,
-                'COMMENT' => $row['Comment']
-            ];
+                'EXTRA' => $extraValue,
+                'COMMENT' => $commentValue,
+                'COLLATION' => $collationValue
+            );
             ++$i;
         }
         return $desc;
@@ -243,14 +258,14 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
         $count = intval($count);
         if ($count <= 0) {
             /** @see Zend_Db_Adapter_Exception */
-            
+
             throw new Zend_Db_Adapter_Exception("LIMIT argument count=$count is not valid");
         }
 
         $offset = intval($offset);
         if ($offset < 0) {
             /** @see Zend_Db_Adapter_Exception */
-            
+
             throw new Zend_Db_Adapter_Exception("LIMIT argument offset=$offset is not valid");
         }
 
@@ -262,4 +277,136 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
         return $sql;
     }
 
+    public function insertOnDuplicate(string $table, array $data, array $fields = []): ?int
+    {
+        // extract and quote col names from the array keys
+        $row = reset($data); // get first element from data array
+        $bind = []; // SQL bind array
+        $values = [];
+
+        if (is_array($row)) { // Array of column-value pairs
+            $cols = array_keys($row);
+            foreach ($data as $row) {
+                if (array_diff($cols, array_keys($row))) {
+                    throw new Zend_Db_Exception('Invalid data for insert');
+                }
+                $values[] = $this->_prepareInsertData($row, $bind);
+            }
+            unset($row);
+        } else { // Column-value pairs
+            $cols = array_keys($data);
+            $values[] = $this->_prepareInsertData($data, $bind);
+        }
+
+        if (empty($fields)) {
+            $fields = $cols;
+        }
+
+        // prepare ON DUPLICATE KEY conditions
+        $pkColumnName = $this->getAutoIncrementColumnName($table);
+        $updateFields = [];
+        foreach ($fields as $k => $v) {
+            $field = $value = null;
+            if (!is_numeric($k)) {
+                $field = $this->quoteIdentifier($k);
+                if ($v instanceof Zend_Db_Expr) {
+                    $value = $v->__toString();
+                } elseif (is_string($v)) {
+                    $value = sprintf('VALUES(%s)', $this->quoteIdentifier($v));
+                } elseif (is_numeric($v)) {
+                    $value = $this->quoteInto('?', $v);
+                }
+            } elseif (is_string($v)) {
+                $value = sprintf('VALUES(%s)', $this->quoteIdentifier($v));
+                $field = $this->quoteIdentifier($v);
+            }
+            if ($field === $pkColumnName) {
+                throw new \RuntimeException('Updating PK column is not supported yet. This needs to be implemented still.');
+            }
+            if ($field && $value) {
+                $updateFields[] = sprintf('%s = %s', $field, $value);
+            }
+        }
+
+        if ($pkColumnName) {
+            $updateFields[] = '`' . $pkColumnName . '` = LAST_INSERT_ID(`' . $pkColumnName . '`)';
+        }
+
+        $insertSql = $this->_getInsertSqlQuery($table, $cols, $values);
+        if ($updateFields) {
+            $insertSql .= ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updateFields);
+        }
+        // execute the statement and return the number of affected rows
+        $stmt = $this->query($insertSql, array_values($bind));
+
+        $affectedRows = $stmt->rowCount();
+        $affectedRowId = $this->lastInsertId($table);
+
+        if(is_numeric($affectedRowId)) {
+            return (int)$affectedRowId;
+        }
+        return null;
+    }
+
+    /**
+     * Return insert sql query
+     *
+     * @param string $tableName
+     * @param array $columns
+     * @param array $values
+     * @return string
+     */
+    protected function _getInsertSqlQuery($tableName, array $columns, array $values)
+    {
+        $tableName = $this->quoteIdentifier($tableName, true);
+        $columns = array_map([$this, 'quoteIdentifier'], $columns);
+        $columns = implode(',', $columns);
+        $values = implode(', ', $values);
+
+        $insertSql = sprintf('INSERT INTO %s (%s) VALUES %s', $tableName, $columns, $values);
+
+        return $insertSql;
+    }
+
+    /**
+     * Prepare insert data
+     *
+     * @param mixed $row
+     * @param array $bind
+     * @return string
+     */
+    protected function _prepareInsertData($row, &$bind)
+    {
+        if (is_array($row)) {
+            $line = [];
+            foreach ($row as $value) {
+                if ($value instanceof Zend_Db_Expr) {
+                    $line[] = $value->__toString();
+                } else {
+                    $line[] = '?';
+                    $bind[] = $value;
+                }
+            }
+            $line = implode(', ', $line);
+        } elseif ($row instanceof Zend_Db_Expr) {
+            $line = $row->__toString();
+        } else {
+            $line = '?';
+            $bind[] = $row;
+        }
+
+        return sprintf('(%s)', $line);
+    }
+
+
+    public function getAutoIncrementColumnName(string $tableName): ?string
+    {
+        $describe = $this->describeTable($tableName);
+        foreach ($describe as $column) {
+            if ($column['EXTRA'] === 'auto_increment') {
+                return $column['COLUMN_NAME'];
+            }
+        }
+        return null;
+    }
 }

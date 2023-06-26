@@ -892,6 +892,9 @@ abstract class Zend_Db_Adapter_Abstract
     }
 
     /**
+     * Our own version of "quoteInto()" supports multiple "?" and takes an array of $value.
+     * Backwards compatible with single "?" and single $value
+     *
      * Quotes a value and places into a piece of text at a placeholder.
      *
      * The placeholder is a question-mark; all placeholders will be replaced
@@ -904,18 +907,27 @@ abstract class Zend_Db_Adapter_Abstract
      * // $safe = "WHERE date < '2005-01-02'"
      * </code>
      *
-     * @param string $text The text with a placeholder.
-     * @param Zend_Db_Select|Zend_Db_Expr|array|null|int|string|float $value OPTIONAL A single value to quote into the condition.
-     * @param null|string|int $type OPTIONAL The type of the given value e.g. Zend_Db::INT_TYPE, "INT"
+     * @param string  $text  The text with a placeholder.
+     * @param mixed   $value The value to quote.
+     * @param string  $type  OPTIONAL SQL datatype
      * @param integer $count OPTIONAL count of placeholders to replace
      * @return string An SQL-safe quoted value placed into the original text.
      */
     public function quoteInto($text, $value, $type = null, $count = null)
     {
-        if ($count === null) {
-            return str_replace('?', $this->quote($value, $type), $text);
+        if (is_array($value) && substr_count($text, '?') > 1) {
+            // TODO test this
+            $where = $text;
+            foreach ($value as $oneValue) {
+                $where = $this->str_replace_first('?', $this->quote($oneValue, $type), $where);
+            }
+            return $where;
         } else {
-            return implode($this->quote($value, $type), explode('?', $text, $count + 1));
+            if ($count === null) {
+                return str_replace('?', $this->quote($value, $type), $text);
+            } else {
+                return implode($this->quote($value, $type), explode('?', $text, $count + 1));
+            }
         }
     }
 
@@ -1256,4 +1268,6 @@ abstract class Zend_Db_Adapter_Abstract
      * @return string
      */
     abstract public function getServerVersion();
+
+
 }
