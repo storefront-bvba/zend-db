@@ -1269,5 +1269,5 @@ abstract class Zend_Db_Adapter_Abstract
      */
     abstract public function getServerVersion();
 
-
+    abstract public function insertOnDuplicate(string $table, array $data, array $fields = []): ?int;
 }
