@@ -176,7 +176,7 @@ abstract class Zend_Db_Adapter_Abstract
                 /**
                  * @see Zend_Db_Adapter_Exception
                  */
-                
+
                 throw new Zend_Db_Adapter_Exception('Adapter parameters must be in an array or a Zend_Config object');
             }
         }
@@ -232,9 +232,10 @@ abstract class Zend_Db_Adapter_Abstract
                     break;
                 default:
                     /** @see Zend_Db_Adapter_Exception */
-                    
-                    throw new Zend_Db_Adapter_Exception('Case must be one of the following constants: '
-                        . 'Zend_Db::CASE_NATURAL, Zend_Db::CASE_LOWER, Zend_Db::CASE_UPPER');
+
+                    throw new Zend_Db_Adapter_Exception(
+                        'Case must be one of the following constants: ' . 'Zend_Db::CASE_NATURAL, Zend_Db::CASE_LOWER, Zend_Db::CASE_UPPER'
+                    );
             }
         }
 
@@ -284,7 +285,7 @@ abstract class Zend_Db_Adapter_Abstract
         // we need at least a dbname
         if (!array_key_exists('dbname', $config)) {
             /** @see Zend_Db_Adapter_Exception */
-            
+
             throw new Zend_Db_Adapter_Exception("Configuration array must have a key for 'dbname' that names the database instance");
         }
 
@@ -292,7 +293,7 @@ abstract class Zend_Db_Adapter_Abstract
             /**
              * @see Zend_Db_Adapter_Exception
              */
-            
+
             throw new Zend_Db_Adapter_Exception("Configuration array must have a key for 'password' for login credentials");
         }
 
@@ -300,7 +301,7 @@ abstract class Zend_Db_Adapter_Abstract
             /**
              * @see Zend_Db_Adapter_Exception
              */
-            
+
             throw new Zend_Db_Adapter_Exception("Configuration array must have a key for 'username' for login credentials");
         }
     }
@@ -364,15 +365,16 @@ abstract class Zend_Db_Adapter_Abstract
         if ($profilerIsObject = is_object($profiler)) {
             if ($profiler instanceof Zend_Db_Profiler) {
                 $profilerInstance = $profiler;
-            } else if ($profiler instanceof Zend_Config) {
+            } elseif ($profiler instanceof Zend_Config) {
                 $profiler = $profiler->toArray();
             } else {
                 /**
                  * @see Zend_Db_Profiler_Exception
                  */
-                
-                throw new Zend_Db_Profiler_Exception('Profiler argument must be an instance of either Zend_Db_Profiler'
-                    . ' or Zend_Config when provided as an object');
+
+                throw new Zend_Db_Profiler_Exception(
+                    'Profiler argument must be an instance of either Zend_Db_Profiler' . ' or Zend_Config when provided as an object'
+                );
             }
         }
 
@@ -386,7 +388,7 @@ abstract class Zend_Db_Adapter_Abstract
             if (isset($profiler['instance'])) {
                 $profilerInstance = $profiler['instance'];
             }
-        } else if (!$profilerIsObject) {
+        } elseif (!$profilerIsObject) {
             $enabled = (bool)$profiler;
         }
 
@@ -396,9 +398,10 @@ abstract class Zend_Db_Adapter_Abstract
 
         if (!$profilerInstance instanceof Zend_Db_Profiler) {
             /** @see Zend_Db_Profiler_Exception */
-            
-            throw new Zend_Db_Profiler_Exception('Class ' . get_class($profilerInstance) . ' does not extend '
-                . 'Zend_Db_Profiler');
+
+            throw new Zend_Db_Profiler_Exception(
+                'Class ' . get_class($profilerInstance) . ' does not extend ' . 'Zend_Db_Profiler'
+            );
         }
 
         if (null !== $enabled) {
@@ -552,7 +555,7 @@ abstract class Zend_Db_Adapter_Abstract
                         $i++;
                     } else {
                         /** @see Zend_Db_Adapter_Exception */
-                        
+
                         throw new Zend_Db_Adapter_Exception(get_class($this) . " doesn't support positional or named binding");
                     }
                 }
@@ -560,10 +563,7 @@ abstract class Zend_Db_Adapter_Abstract
         }
 
         // build the statement
-        $sql = "INSERT INTO "
-            . $this->quoteIdentifier($table, true)
-            . ' (' . implode(', ', $cols) . ') '
-            . 'VALUES (' . implode(', ', $vals) . ')';
+        $sql = "INSERT INTO " . $this->quoteIdentifier($table, true) . ' (' . implode(', ', $cols) . ') ' . 'VALUES (' . implode(', ', $vals) . ')';
 
         // execute the statement and return the number of affected rows
         if ($this->supportsParameters('positional')) {
@@ -606,7 +606,7 @@ abstract class Zend_Db_Adapter_Abstract
                         $i++;
                     } else {
                         /** @see Zend_Db_Adapter_Exception */
-                        
+
                         throw new Zend_Db_Adapter_Exception(get_class($this) . " doesn't support positional or named binding");
                     }
                 }
@@ -619,10 +619,7 @@ abstract class Zend_Db_Adapter_Abstract
         /**
          * Build the UPDATE statement
          */
-        $sql = "UPDATE "
-            . $this->quoteIdentifier($table, true)
-            . ' SET ' . implode(', ', $set)
-            . (($where) ? " WHERE $where" : '');
+        $sql = "UPDATE " . $this->quoteIdentifier($table, true) . ' SET ' . implode(', ', $set) . (($where) ? " WHERE $where" : '');
 
         /**
          * Execute the statement and return the number of affected rows
@@ -650,9 +647,7 @@ abstract class Zend_Db_Adapter_Abstract
         /**
          * Build the DELETE statement
          */
-        $sql = "DELETE FROM "
-            . $this->quoteIdentifier($table, true)
-            . (($where) ? " WHERE $where" : '');
+        $sql = "DELETE FROM " . $this->quoteIdentifier($table, true) . (($where) ? " WHERE $where" : '');
 
         /**
          * Execute the statement and return the number of affected rows
@@ -870,7 +865,8 @@ abstract class Zend_Db_Adapter_Abstract
                     // ANSI SQL-style hex literals (e.g. x'[\dA-F]+')
                     // are not supported here, because these are string
                     // literals, not numeric literals.
-                    if (preg_match('/^(
+                    if (preg_match(
+                        '/^(
                           [+-]?                  # optional sign
                           (?:
                             0[Xx][\da-fA-F]+     # ODBC-style hexadecimal
@@ -878,7 +874,9 @@ abstract class Zend_Db_Adapter_Abstract
                             (?:[eE][+-]?\d+)?    # optional exponent on decimals or octals
                           )
                         )/x',
-                        (string)$value, $matches)) {
+                        (string)$value,
+                        $matches
+                    )) {
                         $quotedValue = $matches[1];
                     }
                     break;
@@ -907,9 +905,9 @@ abstract class Zend_Db_Adapter_Abstract
      * // $safe = "WHERE date < '2005-01-02'"
      * </code>
      *
-     * @param string  $text  The text with a placeholder.
-     * @param mixed   $value The value to quote.
-     * @param string  $type  OPTIONAL SQL datatype
+     * @param string $text The text with a placeholder.
+     * @param mixed $value The value to quote.
+     * @param string $type OPTIONAL SQL datatype
      * @param integer $count OPTIONAL count of placeholders to replace
      * @return string An SQL-safe quoted value placed into the original text.
      */
@@ -1114,7 +1112,7 @@ abstract class Zend_Db_Adapter_Abstract
     {
         if ($this->_allowSerialization == false) {
             /** @see Zend_Db_Adapter_Exception */
-            
+
             throw new Zend_Db_Adapter_Exception(
                 get_class($this) . ' is not allowed to be serialized'
             );
