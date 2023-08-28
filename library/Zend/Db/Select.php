@@ -170,8 +170,7 @@ class Zend_Db_Select
     ];
 
     /**
-     * Class constructor
-     *
+
      * @param Zend_Db_Adapter_Abstract $adapter
      */
     public function __construct(Zend_Db_Adapter_Abstract $adapter)
