@@ -79,19 +79,15 @@ class Zend_Db_Profiler
     const IGNORED = 'ignored';
 
     /**
-     * Array of Zend_Db_Profiler_Query objects.
-     *
-     * @var array
+     * @var Zend_Db_Profiler_Query[]
      */
-    protected $_queryProfiles = [];
+    protected array $_queryProfiles = [];
 
     /**
      * Stores enabled state of the profiler.  If set to False, calls to
      * queryStart() will simply be ignored.
-     *
-     * @var boolean
      */
-    protected $_enabled = false;
+    protected bool $_enabled = false;
 
     /**
      * Stores the number of seconds to filter.  NULL if filtering by time is
@@ -239,10 +235,10 @@ class Zend_Db_Profiler
      * action and immediately returns null.
      *
      * @param string $queryText SQL statement
-     * @param integer $queryType OPTIONAL Type of query, one of the Zend_Db_Profiler::* constants
+     * @param int|null $queryType OPTIONAL Type of query, one of the Zend_Db_Profiler::* constants
      * @return integer|null
      */
-    public function queryStart($queryText, $queryType = null)
+    public function queryStart(string $queryText, int $queryType = null)
     {
         if (!$this->_enabled) {
             return null;
