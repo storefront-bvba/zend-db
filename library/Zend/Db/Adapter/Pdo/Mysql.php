@@ -285,6 +285,7 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
         $values = [];
 
         if (is_array($row)) { // Array of column-value pairs
+            $canReturnAutoIncrementId = false;
             $cols = array_keys($row);
             foreach ($data as $row) {
                 if (array_diff($cols, array_keys($row))) {
@@ -296,6 +297,7 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
         } else { // Column-value pairs
             $cols = array_keys($data);
             $values[] = $this->_prepareInsertData($data, $bind);
+            $canReturnAutoIncrementId = true;
         }
 
         if (empty($fields)) {
@@ -328,7 +330,7 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
             }
         }
 
-        if ($pkColumnName) {
+        if ($canReturnAutoIncrementId && $pkColumnName) {
             $updateFields[] = '`' . $pkColumnName . '` = LAST_INSERT_ID(`' . $pkColumnName . '`)';
         }
 
