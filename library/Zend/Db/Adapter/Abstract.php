@@ -635,12 +635,9 @@ abstract class Zend_Db_Adapter_Abstract
 
     /**
      * Deletes table rows based on a WHERE clause.
-     *
-     * @param mixed $table The table to update.
-     * @param mixed $where DELETE WHERE clause(s).
      * @return int          The number of affected rows.
      */
-    public function delete($table, $where = '')
+    public function delete(string $table, string|array $where = ''): int
     {
         $where = $this->_whereExpr($where);
 
