@@ -926,6 +926,12 @@ abstract class Zend_Db_Adapter_Abstract
         }
     }
 
+    private function str_replace_first($from, $to, $content)
+    {
+        $from = '/' . preg_quote($from, '/') . '/';
+        return preg_replace($from, $to, $content, 1);
+    }
+
     /**
      * Quotes an identifier.
      *
