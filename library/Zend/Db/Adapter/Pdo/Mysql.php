@@ -38,6 +38,11 @@
 class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
 {
 
+    const array TYPES_INTEGER = ['tinyint', 'int', 'smallint', 'mediumint', 'bigint'];
+    const array TYPES_DECIMAL = ['float', 'double', 'real', 'decimal'];
+    const array TYPES_NUMERIC = ['tinyint', 'int', 'smallint', 'mediumint', 'bigint', 'float', 'double', 'real', 'decimal'];
+    const array TYPES_TEXT = ['tinytext', 'text', 'smalltext', 'mediumtext', 'bigtext', 'char', 'varchar'];
+
     /**
      * PDO type.
      *
@@ -99,12 +104,6 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
         if ($this->_connection) {
             return;
         }
-
-        if (!empty($this->_config['charset']) && version_compare(PHP_VERSION, '5.3.6', '<')) {
-            $initCommand = "SET NAMES '" . $this->_config['charset'] . "'";
-            $this->_config['driver_options'][1002] = $initCommand; // 1002 = PDO::MYSQL_ATTR_INIT_COMMAND
-        }
-
         parent::_connect();
     }
 
@@ -244,6 +243,18 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
         return $desc;
     }
 
+    public function describeColumn(string $tableName, string $columnName, string $schemaName = null): Zend_Db_Table_Column_Describe
+    {
+        $describe = $this->describeTable($tableName, $schemaName);
+        $describe = $describe[$columnName] ?? null;
+
+        if ($describe === null) {
+            throw new Zend_Db_Adapter_Exception('Column "' . $columnName . '" does not exist in table "' . $tableName . '".');
+        } else {
+            return new Zend_Db_Table_Column_Describe($describe);
+        }
+    }
+
     /**
      * Adds an adapter-specific LIMIT clause to the SELECT statement.
      *
@@ -344,7 +355,7 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
         $affectedRows = $stmt->rowCount();
         $affectedRowId = $this->lastInsertId($table);
 
-        if(is_numeric($affectedRowId)) {
+        if (is_numeric($affectedRowId)) {
             return (int)$affectedRowId;
         }
         return null;
@@ -410,5 +421,42 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
             }
         }
         return null;
+    }
+
+
+    public function getMaxLength(string $table, string $column): ?int
+    {
+        $describe = $this->describeTable($table);
+        $describe = $describe[$column];
+        $length = $describe['length'];
+        return $length;
+    }
+
+    public function getMaxValue(string $table, string $column): ?int
+    {
+        // TODO implement
+        $describe = $this->describeTable($table);
+        $describe = $describe[$column];
+        $type = $describe['type'];
+        switch ($type) {
+            case 'int':
+                return 123;
+            default:
+                throw new \RuntimeException('Not implemented yet');
+        }
+    }
+
+    public function getMinValue(string $table, string $column): ?int
+    {
+        // TODO implement
+        $describe = $this->describeTable($table);
+        $describe = $describe[$column];
+        $type = $describe['type'];
+        switch ($type) {
+            case 'int':
+                return 123;
+            default:
+                throw new \RuntimeException('Not implemented yet');
+        }
     }
 }
