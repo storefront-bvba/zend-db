@@ -132,10 +132,8 @@ class Zend_Db_Select
 
     /**
      * Specify legal union types.
-     *
-     * @var array
      */
-    protected static $_unionTypes = [
+    protected static array $_unionTypes = [
         self::SQL_UNION,
         self::SQL_UNION_ALL
     ];
@@ -143,10 +141,8 @@ class Zend_Db_Select
     /**
      * The component parts of a SELECT statement.
      * Initialized to the $_partsInit array in the constructor.
-     *
-     * @var array
      */
-    protected $_parts = [];
+    protected array $_parts = [];
 
     /**
      * Tracks which columns are being select from each table and join.
@@ -844,14 +840,14 @@ class Zend_Db_Select
                 );
             }
 
-            if ($type == self::FROM) {
+            if ($type === self::FROM) {
                 // append this from after the last from joinType
                 $tmpFromParts = $this->_parts[self::FROM];
                 $this->_parts[self::FROM] = [];
                 // move all the froms onto the stack
                 while ($tmpFromParts) {
                     $currentCorrelationName = key($tmpFromParts);
-                    if ($tmpFromParts[$currentCorrelationName]['joinType'] != self::FROM) {
+                    if ($tmpFromParts[$currentCorrelationName]['joinType'] !== self::FROM) {
                         break;
                     }
                     $lastFromCorrelationName = $currentCorrelationName;
@@ -873,7 +869,7 @@ class Zend_Db_Select
         }
 
         // add to the columns from this joined table
-        if ($type == self::FROM && $lastFromCorrelationName == null) {
+        if ($type === self::FROM && $lastFromCorrelationName === null) {
             $lastFromCorrelationName = true;
         }
         $this->_tableCols($correlationName, $cols, $lastFromCorrelationName);
