@@ -40,6 +40,7 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
 
     const array TYPES_INTEGER = ['tinyint', 'int', 'smallint', 'mediumint', 'bigint'];
     const array TYPES_DECIMAL = ['float', 'double', 'real', 'decimal'];
+    const array TYPES_TIMESTAMP = ['timestamp', 'datetime'];
     const array TYPES_NUMERIC = ['tinyint', 'int', 'smallint', 'mediumint', 'bigint', 'float', 'double', 'real', 'decimal'];
     const array TYPES_TEXT = ['tinytext', 'text', 'smalltext', 'mediumtext', 'bigtext', 'char', 'varchar'];
 
@@ -254,6 +255,22 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
             return new Zend_Db_Table_Column_Describe($describe);
         }
     }
+
+    /**
+     * @return Zend_Db_Table_Column_Describe[]
+     */
+    public function describeTableAsObjects(string $tableName, string $schemaName = null): array
+    {
+        $r = [];
+        $describe = $this->describeTable($tableName, $schemaName);
+
+        foreach($describe as $column){
+            $obj = new Zend_Db_Table_Column_Describe($column);
+            $r[$obj->getColumnName()] = $obj;
+        }
+        return $r;
+    }
+
 
     /**
      * Adds an adapter-specific LIMIT clause to the SELECT statement.

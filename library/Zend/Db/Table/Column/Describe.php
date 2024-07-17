@@ -21,6 +21,8 @@ class Zend_Db_Table_Column_Describe
     public const int MAX_MEDIUMINT_UNSIGNED_VALUE = 16777215;
     public const int MAX_INT_UNSIGNED_VALUE = 4294967295;
 
+    public const int MAX_TEXT_LENGTH = 65535;
+
     private array $describe;
 
     public function __construct(array $describe)
@@ -57,7 +59,13 @@ class Zend_Db_Table_Column_Describe
             if (isset($this->describe['LENGTH']) && is_numeric($this->describe['LENGTH'])) {
                 return (int)$this->describe['LENGTH'];
             } else {
-                throw new \RuntimeException('Unsupported case.');
+                $type = $this->getDataType();
+                switch ($type) {
+                    case 'text':
+                        return self::MAX_TEXT_LENGTH;
+                    default:
+                        throw new \RuntimeException('Unsupported case: ' . $type);
+                }
             }
         } else {
             return null;
@@ -92,7 +100,8 @@ class Zend_Db_Table_Column_Describe
         }
     }
 
-    public function getMaxNumericValue(): int{
+    public function getMaxNumericValue(): int
+    {
         if ($this->isNumericField()) {
             $type = $this->getDataType();
             if ($this->isUnsigned()) {
@@ -165,9 +174,29 @@ class Zend_Db_Table_Column_Describe
         return false;
     }
 
+    public function isTimestamp(): bool
+    {
+        $dt = $this->getDataType();
+        if (in_array($dt, Zend_Db_Adapter_Pdo_Mysql::TYPES_TIMESTAMP, true)) {
+            return true;
+        }
+        return false;
+    }
+
     public function isUnsigned(): bool
     {
         return str_contains($this->getDataTypeFull(), ' unsigned');
+    }
+
+    public function isNullable(): bool
+    {
+        return $this->describe['NULLABLE'];
+    }
+
+    public function isBoolean(): bool
+    {
+        $type = $this->getDataType();
+        return $type === 'tinyint';
     }
 
 }
