@@ -76,6 +76,11 @@ abstract class Zend_Db_Adapter_Pdo_Abstract extends Zend_Db_Adapter_Abstract
         return $this->_pdoType . ':' . implode(';', $dsn);
     }
 
+    public function reconnect(): void
+    {
+        $this->_connect();
+    }
+
     /**
      * Creates a PDO object and connects to the database.
      *
