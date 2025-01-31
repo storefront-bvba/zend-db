@@ -199,4 +199,14 @@ class Zend_Db_Table_Column_Describe
         return $type === 'tinyint';
     }
 
+    public function isPrimaryKey(): bool
+    {
+        return $this->describe['IDENTITY'] === true;
+    }
+
+    public function isGenerated(): bool
+    {
+        return str_contains($this->describe['EXTRA'], 'GENERATED');
+    }
+
 }
