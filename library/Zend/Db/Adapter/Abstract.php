@@ -640,10 +640,6 @@ abstract class Zend_Db_Adapter_Abstract
     public function delete(string $table, string|array $where = ''): int
     {
         $where = $this->_whereExpr($where);
-
-        /**
-         * Build the DELETE statement
-         */
         $sql = "DELETE FROM " . $this->quoteIdentifier($table, true) . (($where) ? " WHERE $where" : '');
 
         /**
@@ -919,6 +915,9 @@ abstract class Zend_Db_Adapter_Abstract
             return $where;
         } else {
             if ($count === null) {
+//                if (!str_contains($text, '?')) {
+//                    throw new \RuntimeException('Condition to quote into does not contain a "?": ' . $text);
+//                }
                 return str_replace('?', $this->quote($value, $type), $text);
             } else {
                 return implode($this->quote($value, $type), explode('?', $text, $count + 1));
