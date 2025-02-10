@@ -474,6 +474,12 @@ abstract class Zend_Db_Adapter_Abstract
             $bind = [$bind];
         }
 
+        foreach ($bind as $item) {
+            if (is_array($item)) {
+                throw new \InvalidArgumentException('Bind argument must be an array, but cannot contain other arrays.');
+            }
+        }
+
         // prepare and execute the statement with profiling
         $stmt = $this->prepare($sql);
         $stmt->execute($bind);
