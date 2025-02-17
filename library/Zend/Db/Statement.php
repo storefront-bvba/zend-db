@@ -406,7 +406,6 @@ abstract class Zend_Db_Statement implements Zend_Db_Statement_Interface
      *
      * @param int $mode The fetch mode.
      * @return bool
-     * @throws Zend_Db_Statement_Exception
      */
     public function setFetchMode($mode)
     {

@@ -20,13 +20,6 @@
  * @version    $Id$
  */
 
-
-/**
- * @see Zend_Db_Exception
- */
-
-
-
 /**
  * @category   Zend
  * @package    Zend_Db

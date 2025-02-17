@@ -159,7 +159,6 @@ abstract class Zend_Db_Adapter_Abstract
      * socket         => (string) The socket or named pipe that should be used
      *
      * @param array|Zend_Config $config An array or instance of Zend_Config having configuration data
-     * @throws Zend_Db_Adapter_Exception
      */
     public function __construct($config)
     {

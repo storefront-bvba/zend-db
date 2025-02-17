@@ -461,7 +461,6 @@ abstract class Zend_Db_Table_Abstract
      * @param string $tableClassname
      * @param string $ruleKey OPTIONAL
      * @return array
-     * @throws Zend_Db_Table_Exception
      */
     public function getReference($tableClassname, $ruleKey = null)
     {
@@ -598,7 +597,6 @@ abstract class Zend_Db_Table_Abstract
     /**
      * @param mixed $db Either an Adapter object, or a string naming a Registry key
      * @return Zend_Db_Adapter_Abstract | null
-     * @throws Zend_Db_Table_Exception
      */
     protected static function _setupAdapter($db)
     {

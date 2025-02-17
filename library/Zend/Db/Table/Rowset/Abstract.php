@@ -187,7 +187,6 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
      *
      * @param Zend_Db_Table_Abstract $table
      * @return boolean
-     * @throws Zend_Db_Table_Row_Exception
      */
     public function setTable(Zend_Db_Table_Abstract $table)
     {
@@ -288,7 +287,6 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
      * Required by interface SeekableIterator.
      *
      * @param int $position the position to seek to
-     * @throws Zend_Db_Table_Rowset_Exception
      */
     public function seek($position): void
     {
@@ -358,7 +356,6 @@ abstract class Zend_Db_Table_Rowset_Abstract implements SeekableIterator, Counta
      * @param int $position the position of the row expected
      * @param bool $seek wether or not seek the iterator to that position after
      * @return Zend_Db_Table_Row
-     * @throws Zend_Db_Table_Rowset_Exception
      */
     public function getRow($position, $seek = false)
     {

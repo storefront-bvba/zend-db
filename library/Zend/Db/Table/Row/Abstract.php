@@ -109,7 +109,6 @@ abstract class Zend_Db_Table_Row_Abstract implements ArrayAccess, IteratorAggreg
      *
      * @param array $config OPTIONAL Array of user-specified config options.
      * @return void
-     * @throws Zend_Db_Table_Row_Exception
      */
     public function __construct(array $config = [])
     {
@@ -187,7 +186,6 @@ abstract class Zend_Db_Table_Row_Abstract implements ArrayAccess, IteratorAggreg
      * @param string $columnName The column key.
      * @param mixed $value The value for the property.
      * @return void
-     * @throws Zend_Db_Table_Row_Exception
      */
     public function __set($columnName, $value)
     {

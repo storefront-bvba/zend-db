@@ -688,7 +688,6 @@ class Zend_Db_Select
      *
      * @param string $part
      * @return mixed
-     * @throws Zend_Db_Select_Exception
      */
     public function getPart($part)
     {
@@ -779,7 +778,6 @@ class Zend_Db_Select
      * @param array|string $cols The columns to select from the joined table
      * @param string $schema The database name to specify, if any.
      * @return $this This Zend_Db_Select object
-     * @throws Zend_Db_Select_Exception
      */
     protected function _join($type, $name, $cond, $cols, $schema = null)
     {

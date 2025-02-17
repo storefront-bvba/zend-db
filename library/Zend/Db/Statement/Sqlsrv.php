@@ -57,7 +57,6 @@ class Zend_Db_Statement_Sqlsrv extends Zend_Db_Statement
      *
      * @param string $sql
      * @return void
-     * @throws Zend_Db_Statement_Sqlsrv_Exception
      */
     protected function _prepare($sql)
     {
@@ -82,7 +81,6 @@ class Zend_Db_Statement_Sqlsrv extends Zend_Db_Statement
      * @param mixed $length OPTIONAL Length of SQL parameter.
      * @param mixed $options OPTIONAL Other options.
      * @return bool
-     * @throws Zend_Db_Statement_Exception
      */
     protected function _bindParam($parameter, &$variable, $type = null, $length = null, $options = null)
     {
@@ -172,7 +170,6 @@ class Zend_Db_Statement_Sqlsrv extends Zend_Db_Statement
      *
      * @param array $params OPTIONAL Values to bind to parameter placeholders.
      * @return bool
-     * @throws Zend_Db_Statement_Exception
      */
     public function _execute(array $params = null)
     {
@@ -218,7 +215,6 @@ class Zend_Db_Statement_Sqlsrv extends Zend_Db_Statement
      * @param int $cursor OPTIONAL Absolute, relative, or other.
      * @param int $offset OPTIONAL Number for absolute or relative cursors.
      * @return mixed Array, object, or scalar depending on fetch mode.
-     * @throws Zend_Db_Statement_Exception
      */
     public function fetch($style = null, $cursor = null, $offset = null)
     {
@@ -283,7 +279,6 @@ class Zend_Db_Statement_Sqlsrv extends Zend_Db_Statement
      *
      * @param int $col OPTIONAL Position of the column to fetch.
      * @return string
-     * @throws Zend_Db_Statement_Exception
      */
     public function fetchColumn($col = 0)
     {
@@ -316,7 +311,6 @@ class Zend_Db_Statement_Sqlsrv extends Zend_Db_Statement
      * @param string $class OPTIONAL Name of the class to create.
      * @param array $config OPTIONAL Constructor arguments for the class.
      * @return mixed One object instance of the specified class.
-     * @throws Zend_Db_Statement_Exception
      */
     public function fetchObject($class = 'stdClass', array $config = [])
     {
@@ -345,7 +339,6 @@ class Zend_Db_Statement_Sqlsrv extends Zend_Db_Statement
      *
      * @param int $column
      * @return mixed
-     * @throws Zend_Db_Statement_Sqlsrv_Exception
      */
     public function getColumnMeta($column)
     {
@@ -368,7 +361,6 @@ class Zend_Db_Statement_Sqlsrv extends Zend_Db_Statement
      * the results of multiple queries.
      *
      * @return bool
-     * @throws Zend_Db_Statement_Exception
      */
     public function nextRowset()
     {
@@ -389,7 +381,6 @@ class Zend_Db_Statement_Sqlsrv extends Zend_Db_Statement
      * statement object.
      *
      * @return int     The number of rows affected.
-     * @throws Zend_Db_Statement_Exception
      */
     public function rowCount()
     {

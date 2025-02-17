@@ -282,7 +282,6 @@ class Zend_Db_Profiler
      *
      * @param integer $queryId
      * @return string   Inform that a query is stored or ignored.
-     * @throws Zend_Db_Profiler_Exception
      */
     public function queryEnd($queryId)
     {
@@ -341,7 +340,6 @@ class Zend_Db_Profiler
      *
      * @param integer $queryId
      * @return Zend_Db_Profiler_Query
-     * @throws Zend_Db_Profiler_Exception
      */
     public function getQueryProfile($queryId)
     {

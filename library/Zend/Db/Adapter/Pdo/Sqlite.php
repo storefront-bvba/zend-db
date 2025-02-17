@@ -99,7 +99,6 @@ class Zend_Db_Adapter_Pdo_Sqlite extends Zend_Db_Adapter_Pdo_Abstract
      * Throw exceptions if any are missing.
      *
      * @param array $config
-     * @throws Zend_Db_Adapter_Exception
      */
     protected function _checkRequiredOptions(array $config)
     {
@@ -123,7 +122,6 @@ class Zend_Db_Adapter_Pdo_Sqlite extends Zend_Db_Adapter_Pdo_Abstract
      * Special configuration for SQLite behavior: make sure that result sets
      * contain keys like 'column' instead of 'table.column'.
      *
-     * @throws Zend_Db_Adapter_Exception
      */
     protected function _connect()
     {

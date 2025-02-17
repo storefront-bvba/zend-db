@@ -98,7 +98,6 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
      * Creates a PDO object and connects to the database.
      *
      * @return void
-     * @throws Zend_Db_Adapter_Exception
      */
     protected function _connect()
     {
@@ -279,7 +278,6 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
      * @param integer $count
      * @param integer $offset OPTIONAL
      * @return string
-     * @throws Zend_Db_Adapter_Exception
      */
     public function limit($sql, $count, $offset = 0)
     {

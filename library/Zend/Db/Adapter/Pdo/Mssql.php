@@ -309,7 +309,6 @@ class Zend_Db_Adapter_Pdo_Mssql extends Zend_Db_Adapter_Pdo_Abstract
      * @param string $sql
      * @param integer $count
      * @param integer $offset OPTIONAL
-     * @throws Zend_Db_Adapter_Exception
      * @return string
      */
     public function limit($sql, $count, $offset = 0)
@@ -390,7 +389,6 @@ class Zend_Db_Adapter_Pdo_Mssql extends Zend_Db_Adapter_Pdo_Abstract
      * @param string $tableName OPTIONAL Name of table.
      * @param string $primaryKey OPTIONAL Name of primary key column.
      * @return string
-     * @throws Zend_Db_Adapter_Exception
      */
     public function lastInsertId($tableName = null, $primaryKey = null)
     {

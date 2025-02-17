@@ -85,7 +85,6 @@ abstract class Zend_Db_Adapter_Pdo_Abstract extends Zend_Db_Adapter_Abstract
      * Creates a PDO object and connects to the database.
      *
      * @return void
-     * @throws Zend_Db_Adapter_Exception
      */
     protected function _connect()
     {
@@ -230,11 +229,7 @@ abstract class Zend_Db_Adapter_Pdo_Abstract extends Zend_Db_Adapter_Abstract
         try {
             return parent::query($sql, $bind);
         } catch (PDOException $e) {
-            /**
-             * @see Zend_Db_Statement_Exception
-             */
-
-            throw new Zend_Db_Statement_Exception($e->getMessage(), $e->getCode(), $e);
+            throw new Zend_Db_Statement_Exception($e->getMessage(), (int) $e->getCode(), $e);
         }
     }
 
@@ -266,11 +261,7 @@ abstract class Zend_Db_Adapter_Pdo_Abstract extends Zend_Db_Adapter_Abstract
 
             return $affected;
         } catch (PDOException $e) {
-            /**
-             * @see Zend_Db_Adapter_Exception
-             */
-
-            throw new Zend_Db_Adapter_Exception($e->getMessage(), $e->getCode(), $e);
+            throw new Zend_Db_Adapter_Exception($e->getMessage(), (int) $e->getCode(), $e);
         }
     }
 
@@ -323,7 +314,6 @@ abstract class Zend_Db_Adapter_Pdo_Abstract extends Zend_Db_Adapter_Abstract
      *
      * @param int $mode A PDO fetch mode.
      * @return void
-     * @throws Zend_Db_Adapter_Exception
      * @todo Support FETCH_CLASS and FETCH_INTO.
      *
      */

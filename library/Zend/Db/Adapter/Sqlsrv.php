@@ -108,7 +108,6 @@ class Zend_Db_Adapter_Sqlsrv extends Zend_Db_Adapter_Abstract
      * Creates a connection resource.
      *
      * @return void
-     * @throws Zend_Db_Adapter_Sqlsrv_Exception
      */
     protected function _connect()
     {
@@ -174,7 +173,6 @@ class Zend_Db_Adapter_Sqlsrv extends Zend_Db_Adapter_Abstract
      * Throw exceptions if any are missing.
      *
      * @param array $config
-     * @throws Zend_Db_Adapter_Exception
      */
     protected function _checkRequiredOptions(array $config)
     {
@@ -209,7 +207,6 @@ class Zend_Db_Adapter_Sqlsrv extends Zend_Db_Adapter_Abstract
      *
      * @param integer|null $level A fetch mode from SQLSRV_TXN_*.
      * @return true
-     * @throws Zend_Db_Adapter_Sqlsrv_Exception
      */
     public function setTransactionIsolationLevel($level = null)
     {
@@ -514,7 +511,6 @@ class Zend_Db_Adapter_Sqlsrv extends Zend_Db_Adapter_Abstract
      * Leave autocommit mode and begin a transaction.
      *
      * @return void
-     * @throws Zend_Db_Adapter_Sqlsrv_Exception
      */
     protected function _beginTransaction()
     {
@@ -528,7 +524,6 @@ class Zend_Db_Adapter_Sqlsrv extends Zend_Db_Adapter_Abstract
      * Commit a transaction and return to autocommit mode.
      *
      * @return void
-     * @throws Zend_Db_Adapter_Sqlsrv_Exception
      */
     protected function _commit()
     {
@@ -542,7 +537,6 @@ class Zend_Db_Adapter_Sqlsrv extends Zend_Db_Adapter_Abstract
      * Roll back a transaction and return to autocommit mode.
      *
      * @return void
-     * @throws Zend_Db_Adapter_Sqlsrv_Exception
      */
     protected function _rollBack()
     {
@@ -559,7 +553,6 @@ class Zend_Db_Adapter_Sqlsrv extends Zend_Db_Adapter_Abstract
      *
      * @param integer $mode A fetch mode.
      * @return void
-     * @throws Zend_Db_Adapter_Sqlsrv_Exception
      */
     public function setFetchMode($mode)
     {
@@ -588,7 +581,6 @@ class Zend_Db_Adapter_Sqlsrv extends Zend_Db_Adapter_Abstract
      * @param integer $count
      * @param integer $offset OPTIONAL
      * @return string
-     * @throws Zend_Db_Adapter_Sqlsrv_Exception
      */
      public function limit($sql, $count, $offset = 0)
      {
