@@ -303,7 +303,7 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
         return $sql;
     }
 
-    public function insertOnDuplicate(string $table, array $data, array $fields = []): ?int
+    public function insertOnDuplicate(string $table, array $data, array $fieldsToUpdate = []): ?int
     {
         // extract and quote col names from the array keys
         $row = reset($data); // get first element from data array
@@ -326,14 +326,14 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
             $canReturnAutoIncrementId = true;
         }
 
-        if (empty($fields)) {
-            $fields = $cols;
+        if (empty($fieldsToUpdate)) {
+            $fieldsToUpdate = $cols;
         }
 
         // prepare ON DUPLICATE KEY conditions
         $pkColumnName = $this->getAutoIncrementColumnName($table);
         $updateFields = [];
-        foreach ($fields as $k => $v) {
+        foreach ($fieldsToUpdate as $k => $v) {
             $field = $value = null;
             if (!is_numeric($k)) {
                 $field = $this->quoteIdentifier($k);
