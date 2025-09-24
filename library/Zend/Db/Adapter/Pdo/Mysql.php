@@ -263,7 +263,7 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
         $r = [];
         $describe = $this->describeTable($tableName, $schemaName);
 
-        foreach($describe as $column){
+        foreach ($describe as $column) {
             $obj = new Zend_Db_Table_Column_Describe($column);
             $r[$obj->getColumnName()] = $obj;
         }
@@ -407,7 +407,13 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
     {
         if (is_array($row)) {
             $line = [];
-            foreach ($row as $value) {
+            foreach ($row as $key => $value) {
+                if ($value === false) {
+                    $value = 0;
+                } elseif ($value === true) {
+                    $value = 1;
+                }
+
                 if ($value instanceof Zend_Db_Expr) {
                     $line[] = $value->__toString();
                 } else {
