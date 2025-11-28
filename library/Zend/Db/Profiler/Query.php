@@ -33,40 +33,21 @@ class Zend_Db_Profiler_Query
 
     /**
      * SQL query string or user comment, set by $query argument in constructor.
-     *
-     * @var string
      */
-    protected $_query = '';
+    protected string $_query = '';
 
     /**
      * One of the Zend_Db_Profiler constants for query type, set by $queryType argument in constructor.
-     *
-     * @var integer
      */
-    protected $_queryType = 0;
+    protected int $_queryType = 0;
 
     /**
      * Unix timestamp with microseconds when instantiated.
-     *
-     * @var float
      */
-    protected $_startedMicrotime = null;
+    protected ?float $_startedMicrotime = null;
 
-    /**
-     * Unix timestamp with microseconds when self::queryEnd() was called.
-     *
-     * @var integer
-     */
-    protected $_endedMicrotime = null;
-
-    /**
-     * @var array
-     */
-    protected $_boundParams = [];
-
-    /**
-     * @var array
-     */
+    protected array $_boundParams = [];
+    private ?float $duration = null;
 
     /**
      * Class constructor.  A query is about to be started, save the query text ($query) and its
@@ -91,7 +72,7 @@ class Zend_Db_Profiler_Query
     public function __clone()
     {
         $this->_boundParams = [];
-        $this->_endedMicrotime = null;
+        $this->duration = null;
         $this->start();
     }
 
@@ -110,22 +91,16 @@ class Zend_Db_Profiler_Query
 
     /**
      * Ends the query and records the time so that the elapsed time can be determined later.
-     *
-     * @return void
      */
-    public function end()
+    public function end(): void
     {
-        $this->_endedMicrotime = microtime(true);
+        $end = microtime(true);
+        $this->duration = $end - $this->_startedMicrotime;
     }
 
-    /**
-     * Returns true if and only if the query has ended.
-     *
-     * @return boolean
-     */
-    public function hasEnded()
+    public function hasEnded(): bool
     {
-        return $this->_endedMicrotime !== null;
+        return $this->duration !== null;
     }
 
     /**
@@ -184,16 +159,13 @@ class Zend_Db_Profiler_Query
     /**
      * Get the elapsed time (in seconds) that the query ran.
      * If the query has not yet ended, false is returned.
-     *
-     * @return float|false
      */
-    public function getElapsedSecs()
+    public function getElapsedSecs(): float | false
     {
-        if (null === $this->_endedMicrotime) {
-            return false;
+        if ($this->hasEnded()) {
+            return $this->duration;
         }
-
-        return $this->_endedMicrotime - $this->_startedMicrotime;
+        return false;
     }
 
     /**
