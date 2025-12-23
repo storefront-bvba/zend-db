@@ -22,6 +22,7 @@ class Zend_Db_Table_Column_Describe
     public const int MAX_INT_UNSIGNED_VALUE = 4294967295;
 
     public const int MAX_TEXT_LENGTH = 65535;
+    public const int MAX_MEDIUMTEXT_LENGTH = 16_777_215;
 
     private array $describe;
 
@@ -63,6 +64,8 @@ class Zend_Db_Table_Column_Describe
                 switch ($type) {
                     case 'text':
                         return self::MAX_TEXT_LENGTH;
+                    case 'mediumtext':
+                        return self::MAX_MEDIUMTEXT_LENGTH;
                     default:
                         throw new \RuntimeException('Unsupported case: ' . $type);
                 }
