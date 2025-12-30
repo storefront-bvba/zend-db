@@ -13,9 +13,9 @@ class Zend_Db_Table_Column_Describe
     public const MAX_MEDIUMINT_VALUE = 8388607;
     public const int MIN_INT_VALUE = -2147483648;
     public const int MAX_INT_VALUE = 2147483647;
-//    public const int MIN_BIGINT_VALUE = -;
-//    public const int MAX_BIGINT_VALUE = ;
-//    public const int MAX_BIGINT_UNSIGNED_VALUE = ;
+    public const int MIN_BIGINT_VALUE = PHP_INT_MIN;
+    public const int MAX_BIGINT_VALUE = PHP_INT_MAX;
+    public const int MAX_BIGINT_UNSIGNED_VALUE = PHP_INT_MAX;
     public const int MAX_TINYINT_UNSIGNED_VALUE = 255;
     public const int MAX_SMALLINT_UNSIGNED_VALUE = 65535;
     public const int MAX_MEDIUMINT_UNSIGNED_VALUE = 16777215;
@@ -94,8 +94,10 @@ class Zend_Db_Table_Column_Describe
                         return self::MIN_SMALLINT_VALUE;
                     case 'tinyint':
                         return self::MIN_TINYINT_VALUE;
+                    case 'bigint':
+                        return self::MIN_BIGINT_VALUE;
                     default:
-                        throw new \RuntimeException('Unsupported case.');
+                        throw new \RuntimeException('Unsupported type: ' . $type);
                 }
             }
         } else {
@@ -109,9 +111,8 @@ class Zend_Db_Table_Column_Describe
             $type = $this->getDataType();
             if ($this->isUnsigned()) {
                 switch ($type) {
-                    // TODO: PHP may not be able to handle bigint. Might need to be presented as string?
-//                    case 'bigint':
-//                        return self::MAX_BIGINT_UNSIGNED_VALUE;
+                    case 'bigint':
+                        return self::MAX_BIGINT_UNSIGNED_VALUE;
                     case 'int':
                         return self::MAX_INT_UNSIGNED_VALUE;
                     case 'mediumint':
@@ -125,9 +126,8 @@ class Zend_Db_Table_Column_Describe
                 }
             } else {
                 switch ($type) {
-                    // TODO: PHP may not be able to handle bigint. Might need to be presented as string?
-//                    case 'bigint':
-//                        return self::MIN_BIGINT_VALUE;
+                    case 'bigint':
+                        return self::MIN_BIGINT_VALUE;
                     case 'int':
                         return self::MAX_INT_VALUE;
                     case 'mediumint':
@@ -137,7 +137,7 @@ class Zend_Db_Table_Column_Describe
                     case 'tinyint':
                         return self::MAX_TINYINT_VALUE;
                     default:
-                        throw new \RuntimeException('Unsupported case.');
+                        throw new \RuntimeException('Unsupported type: ' . $type);
                 }
             }
         } else {
