@@ -317,12 +317,12 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
                 if (array_diff($cols, array_keys($row))) {
                     throw new Zend_Db_Exception('Invalid data for insert');
                 }
-                $values[] = $this->_prepareInsertData($row, $bind);
+                $values[] = $this->_prepareInsertData($row, $cols, $bind);
             }
             unset($row);
         } else { // Column-value pairs
             $cols = array_keys($data);
-            $values[] = $this->_prepareInsertData($data, $bind);
+            $values[] = $this->_prepareInsertData($data, $cols, $bind);
             $canReturnAutoIncrementId = true;
         }
 
@@ -396,38 +396,25 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
         return $insertSql;
     }
 
-    /**
-     * Prepare insert data
-     *
-     * @param mixed $row
-     * @param array $bind
-     * @return string
-     */
-    protected function _prepareInsertData($row, &$bind)
+    protected function _prepareInsertData(array $row, array $cols, array &$bind): string
     {
-        if (is_array($row)) {
-            $line = [];
-            foreach ($row as $key => $value) {
-                if ($value === false) {
-                    $value = 0;
-                } elseif ($value === true) {
-                    $value = 1;
-                }
-
-                if ($value instanceof Zend_Db_Expr) {
-                    $line[] = $value->__toString();
-                } else {
-                    $line[] = '?';
-                    $bind[] = $value;
-                }
+        $line = [];
+        foreach ($cols as $col) {
+            $value = $row[$col];
+            if ($value === false) {
+                $value = 0;
+            } elseif ($value === true) {
+                $value = 1;
             }
-            $line = implode(', ', $line);
-        } elseif ($row instanceof Zend_Db_Expr) {
-            $line = $row->__toString();
-        } else {
-            $line = '?';
-            $bind[] = $row;
+
+            if ($value instanceof Zend_Db_Expr) {
+                $line[] = $value->__toString();
+            } else {
+                $line[] = '?';
+                $bind[] = $value;
+            }
         }
+        $line = implode(', ', $line);
 
         return sprintf('(%s)', $line);
     }
