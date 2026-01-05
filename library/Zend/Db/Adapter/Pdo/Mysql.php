@@ -314,7 +314,8 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
             $canReturnAutoIncrementId = false;
             $cols = array_keys($row);
             foreach ($data as $row) {
-                if (array_diff($cols, array_keys($row))) {
+                $wrongColumns = array_diff($cols, array_keys($row));
+                if ($wrongColumns) {
                     throw new Zend_Db_Exception('Invalid data for insert');
                 }
                 $values[] = $this->_prepareInsertData($row, $cols, $bind);
