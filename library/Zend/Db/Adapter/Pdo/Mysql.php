@@ -306,13 +306,13 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
     public function insertOnDuplicate(string $table, array $data, array $fieldsToUpdate = []): ?int
     {
         // extract and quote col names from the array keys
-        $row = reset($data); // get first element from data array
+        $firstRow = reset($data); // get first element from data array
         $bind = []; // SQL bind array
         $values = [];
 
-        if (is_array($row)) { // Array of column-value pairs
+        if (is_array($firstRow)) { // Array of column-value pairs
             $canReturnAutoIncrementId = false;
-            $cols = array_keys($row);
+            $cols = array_keys($firstRow);
             foreach ($data as $row) {
                 $wrongColumns = array_diff($cols, array_keys($row));
                 if ($wrongColumns) {
