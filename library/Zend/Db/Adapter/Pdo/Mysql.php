@@ -152,15 +152,31 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
      */
     public function describeTable(string $tableName, string $schemaName = null): array
     {
-        if ($schemaName) {
-            $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier("$schemaName.$tableName", true);
-        } else {
-            $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier($tableName, true);
+        if (!$schemaName) {
+            $schemaName = $this->getConfig()['dbname'];
         }
+        $fullTableName = $schemaName . '.' . $tableName;
+
+        $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier($fullTableName, true);
         $stmt = $this->query($sql);
         $result = $stmt->fetchAll(Zend_Db::FETCH_NUM);
 
-        $field = 0;
+        $checkConstraints = $this->fetchAll(
+            '
+SELECT 
+    tc.CONSTRAINT_NAME,  
+    cc.CHECK_CLAUSE
+FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
+JOIN INFORMATION_SCHEMA.CHECK_CONSTRAINTS cc
+  ON tc.CONSTRAINT_SCHEMA = cc.CONSTRAINT_SCHEMA
+ AND tc.CONSTRAINT_NAME = cc.CONSTRAINT_NAME
+WHERE tc.TABLE_SCHEMA = ' . $this->quote($schemaName) . '
+  AND tc.TABLE_NAME = ' . $this->quote($tableName) . '
+  AND tc.CONSTRAINT_TYPE = \'CHECK\'
+  AND tc.ENFORCED = \'YES\'
+  '
+        );
+
         $type = 1;
         $collation = 2;
         $null = 3;
@@ -169,10 +185,21 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
         $extra = 6;
         $comment = 8;
 
-        $desc = array();
+        $desc = [];
         $i = 1;
         $p = 1;
         foreach ($result as $row) {
+            $columnName = $row[0];
+
+            $checkConstraint = null;
+            foreach ($checkConstraints as $checkConstraint) {
+                $matches = [];
+                if(preg_match('#\(`'.preg_quote($columnName, '#').'` (.+)\)#', $checkConstraint['CHECK_CLAUSE'], $matches)){
+                    $checkConstraint = $matches[1];
+                    break;
+                }
+            }
+
             list(
                 $length, $scale, $precision, $unsigned, $primary, $primaryPosition, $identity
                 ) = array(null, null, null, null, false, null, false);
@@ -219,14 +246,14 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
 
             $extraValue = $row[$extra];
 
-            $desc[$this->foldCase($row[$field])] = array(
-                'SCHEMA_NAME' => null, // @todo
+            $desc[$this->foldCase($columnName)] = array(
+                'SCHEMA_NAME' => $schemaName,
                 'TABLE_NAME' => $this->foldCase($tableName),
-                'COLUMN_NAME' => $this->foldCase($row[$field]),
+                'COLUMN_NAME' => $this->foldCase($columnName),
                 'COLUMN_POSITION' => $i,
                 'DATA_TYPE' => $row[$type],
                 'DEFAULT' => $row[$default],
-                'NULLABLE' => (bool)($row[$null] == 'YES'),
+                'NULLABLE' => ($row[$null] === 'YES'),
                 'LENGTH' => $length,
                 'SCALE' => $scale,
                 'PRECISION' => $precision,
@@ -236,7 +263,8 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
                 'IDENTITY' => $identity,
                 'EXTRA' => $extraValue,
                 'COMMENT' => $commentValue,
-                'COLLATION' => $collationValue
+                'COLLATION' => $collationValue,
+                'CHECK_CONSTRAINT' => $checkConstraint
             );
             ++$i;
         }

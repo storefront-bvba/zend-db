@@ -145,6 +145,11 @@ class Zend_Db_Table_Column_Describe
         }
     }
 
+    public function isBoolean(): bool
+    {
+        return $this->describe['CHECK_CONSTRAINT'] === 'in (0,1)' && $this->getDataType() === 'tinyint';
+    }
+
     public function isTextField(): bool
     {
         $dt = $this->getDataType();
@@ -194,12 +199,6 @@ class Zend_Db_Table_Column_Describe
     public function isNullable(): bool
     {
         return $this->describe['NULLABLE'];
-    }
-
-    public function isBoolean(): bool
-    {
-        $type = $this->getDataType();
-        return $type === 'tinyint';
     }
 
     public function isPrimaryKey(): bool
