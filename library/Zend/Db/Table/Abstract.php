@@ -87,6 +87,7 @@ abstract class Zend_Db_Table_Abstract
      * @var Zend_Db_Adapter_Abstract
      */
     protected static $_defaultDb;
+    private static $_cacheTags = [];
 
     /**
      * Optional Zend_Db_Table_Definition object
@@ -324,6 +325,16 @@ abstract class Zend_Db_Table_Abstract
         }
 
         return $this;
+    }
+
+    public static function getCacheTags(): array
+    {
+        return self::$_cacheTags;
+    }
+
+    public static function setCacheTags(array $tags): void
+    {
+        self::$_cacheTags = $tags;
     }
 
     /**
@@ -823,7 +834,7 @@ abstract class Zend_Db_Table_Abstract
             // Fetch metadata from the adapter's describeTable() method
             $metadata = $this->_db->describeTable($this->_name, $this->_schema);
             // If $this has a metadata cache, then cache the metadata
-            if (null !== $this->_metadataCache && !$this->_metadataCache->save($metadata, $cacheId, [Varien_Db_Adapter_Pdo_Mysql::DDL_CACHE_TAG])) {
+            if (null !== $this->_metadataCache && !$this->_metadataCache->save($metadata, $cacheId, self::getCacheTags())) {
                 trigger_error('Failed saving metadata to metadataCache', E_USER_NOTICE);
             }
         }
