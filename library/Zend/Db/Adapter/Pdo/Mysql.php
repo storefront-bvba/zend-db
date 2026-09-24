@@ -150,7 +150,7 @@ class Zend_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Abstract
      * IDENTITY         => integer; true if column is auto-generated with unique values
      * COMMENT          => string
      */
-    public function describeTable(string $tableName, string $schemaName = null): array
+    public function describeTable(string $tableName, ?string $schemaName = null): array
     {
         if (!$schemaName) {
             $schemaName = $this->getConfig()['dbname'];
@@ -271,7 +271,7 @@ WHERE tc.TABLE_SCHEMA = ' . $this->quote($schemaName) . '
         return $desc;
     }
 
-    public function describeColumn(string $tableName, string $columnName, string $schemaName = null): Zend_Db_Table_Column_Describe
+    public function describeColumn(string $tableName, string $columnName, ?string $schemaName = null): Zend_Db_Table_Column_Describe
     {
         $describe = $this->describeTable($tableName, $schemaName);
         $describe = $describe[$columnName] ?? null;
@@ -286,7 +286,7 @@ WHERE tc.TABLE_SCHEMA = ' . $this->quote($schemaName) . '
     /**
      * @return Zend_Db_Table_Column_Describe[]
      */
-    public function describeTableAsObjects(string $tableName, string $schemaName = null): array
+    public function describeTableAsObjects(string $tableName, ?string $schemaName = null): array
     {
         $r = [];
         $describe = $this->describeTable($tableName, $schemaName);

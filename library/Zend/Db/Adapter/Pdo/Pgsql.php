@@ -141,7 +141,7 @@ class Zend_Db_Adapter_Pdo_Pgsql extends Zend_Db_Adapter_Pdo_Abstract
      *
      * @todo Discover integer unsigned property.
      */
-    public function describeTable(string $tableName, string $schemaName = null): array
+    public function describeTable(string $tableName, ?string $schemaName = null): array
     {
         $sql = "SELECT
                 a.attnum,

@@ -1178,7 +1178,7 @@ abstract class Zend_Db_Adapter_Abstract
      * PRIMARY_POSITION => integer; position of column in primary key
      * COMMENT     => string
      */
-    abstract public function describeTable(string $tableName, string $schemaName = null): array;
+    abstract public function describeTable(string $tableName, ?string $schemaName = null): array;
 
     /**
      * Creates a connection to the database.

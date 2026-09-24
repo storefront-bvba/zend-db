@@ -215,7 +215,7 @@ class Zend_Db_Adapter_Pdo_Mssql extends Zend_Db_Adapter_Pdo_Abstract
      * @todo Discover column primary key position.
      * @todo Discover integer unsigned property.
      */
-    public function describeTable(string $tableName, string $schemaName = null): array
+    public function describeTable(string $tableName, ?string $schemaName = null): array
     {
         if ($schemaName != null) {
             if (strpos($schemaName, '.') !== false) {

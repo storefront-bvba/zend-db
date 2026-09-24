@@ -189,7 +189,7 @@ class Zend_Db_Adapter_Pdo_Sqlite extends Zend_Db_Adapter_Pdo_Abstract
      * PRIMARY_POSITION => integer; position of column in primary key
      * IDENTITY         => integer; true if column is auto-generated with unique values
      */
-    public function describeTable(string $tableName, string $schemaName = null): array
+    public function describeTable(string $tableName, ?string $schemaName = null): array
     {
         $sql = 'PRAGMA ';
 

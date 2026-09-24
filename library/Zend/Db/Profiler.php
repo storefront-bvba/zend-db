@@ -238,7 +238,7 @@ class Zend_Db_Profiler
      * @param int|null $queryType OPTIONAL Type of query, one of the Zend_Db_Profiler::* constants
      * @return integer|null
      */
-    public function queryStart(string $queryText, int $queryType = null)
+    public function queryStart(string $queryText, ?int $queryType = null)
     {
         if (!$this->_enabled) {
             return null;

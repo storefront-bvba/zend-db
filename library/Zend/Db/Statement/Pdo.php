@@ -201,7 +201,7 @@ class Zend_Db_Statement_Pdo extends Zend_Db_Statement implements IteratorAggrega
      * @param array $params OPTIONAL Values to bind to parameter placeholders.
      * @return bool
      */
-    public function _execute(array $params = null)
+    public function _execute(?array $params = null)
     {
         try {
             if ($params !== null) {
