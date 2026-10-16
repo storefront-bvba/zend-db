@@ -8,6 +8,7 @@
 		"db"
 	],
 	"license": "BSD-3-Clause",
+	"abandoned": "storefront/db",
 	"require": {
 		"php": ">=8.3"
 	},
